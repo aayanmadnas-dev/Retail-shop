@@ -279,21 +279,25 @@ export const BillingPage: React.FC = () => {
 
       const createdSale = saleData as Sale;
 
-      // 2. Insert Sale Items
-      const saleItemsToInsert = cart.map((item) => ({
-        business_id: business.id,
-        sale_id: createdSale.id,
-        product_id: item.product.id,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        total: Math.round(item.total * 100) / 100,
-      }));
+     // 2. Insert Sale Items
+const saleItemsToInsert = cart.map((item) => ({
+  business_id: business.id,
+  sale_id: createdSale.id,
+  product_id: item.product.id,
 
-      const { error: itemsError } = await supabase
-        .from('sale_items')
-        .insert(saleItemsToInsert);
+  // Store product name as a historical snapshot
+  product_name: item.product.name,
 
-      if (itemsError) throw itemsError;
+  quantity: Number(item.quantity),
+  unit_price: Number(item.unit_price),
+  total: Math.round(item.total * 100) / 100,
+}));
+
+const { error: itemsError } = await supabase
+  .from('sale_items')
+  .insert(saleItemsToInsert);
+
+if (itemsError) throw itemsError;
 
       // 3. Deduct Stock & Insert Stock Movements
       for (const item of cart) {
