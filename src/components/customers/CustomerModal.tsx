@@ -148,3 +148,4 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
     </Modal>
   );
 };
+

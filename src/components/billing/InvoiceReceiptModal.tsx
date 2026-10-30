@@ -216,3 +216,4 @@ Thank you for shopping with us!`;
     </Modal>
   );
 };
+

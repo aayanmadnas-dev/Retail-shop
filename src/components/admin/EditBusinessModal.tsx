@@ -124,3 +124,4 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
     </Modal>
   );
 };
+

@@ -19,3 +19,4 @@ export const Card: React.FC<CardProps> = ({ className, hover = false, children, 
     </div>
   );
 };
+

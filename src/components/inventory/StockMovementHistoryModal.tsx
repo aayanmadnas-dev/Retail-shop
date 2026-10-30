@@ -135,3 +135,4 @@ export const StockMovementHistoryModal: React.FC<StockMovementHistoryModalProps>
     </Modal>
   );
 };
+

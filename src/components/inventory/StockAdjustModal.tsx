@@ -211,3 +211,4 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
     </Modal>
   );
 };
+

@@ -11,3 +11,4 @@ export interface AuthState {
   isBusinessOwner: boolean;
   isSuspended: boolean;
 }
+

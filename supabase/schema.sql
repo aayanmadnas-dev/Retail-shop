@@ -264,3 +264,4 @@ USING (
     (business_id = public.current_user_business_id() AND public.is_business_active())
     OR public.is_super_admin()
 );
+

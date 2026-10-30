@@ -110,3 +110,4 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
     </Modal>
   );
 };
+
