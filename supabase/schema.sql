@@ -47,7 +47,7 @@ CREATE INDEX IF NOT EXISTS idx_profiles_business_id ON public.profiles(business_
 CREATE TABLE IF NOT EXISTS public.products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     business_id UUID NOT NULL REFERENCES public.businesses(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
+    product_name TEXT NOT NULL,
     sku TEXT,
     barcode TEXT,
     category TEXT,
