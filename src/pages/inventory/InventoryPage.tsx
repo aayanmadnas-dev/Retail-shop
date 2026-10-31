@@ -45,10 +45,12 @@ export const InventoryPage: React.FC = () => {
     if (!business?.id) return;
     setIsLoading(true);
     try {
+      // Only fetch ACTIVE products (is_active = true)
       const { data, error } = await supabase
         .from('products')
         .select('*')
         .eq('business_id', business.id)
+        .eq('is_active', true)
         .order('name', { ascending: true });
 
       if (error) {
@@ -67,24 +69,36 @@ export const InventoryPage: React.FC = () => {
     fetchProducts();
   }, [business?.id]);
 
-  const handleDeleteProduct = async (product: Product) => {
-    if (!window.confirm(`Are you sure you want to delete "${product.name}"? This cannot be undone.`)) {
-      return;
-    }
+  // Confirmation dialog state
+  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // Soft delete: set is_active = false (preserves all sale history)
+  const handleConfirmDeleteProduct = async () => {
+    if (!deletingProduct || !business?.id) return;
+    setIsDeleting(true);
+    setDeleteError(null);
+
     try {
       const { error } = await supabase
         .from('products')
-        .delete()
-        .eq('id', product.id)
-        .eq('business_id', business?.id);
+        .update({ is_active: false })
+        .eq('id', deletingProduct.id)
+        .eq('business_id', business.id);
 
       if (error) {
-        alert(`Failed to delete: ${error.message}`);
-      } else {
-        setProducts((prev) => prev.filter((p) => p.id !== product.id));
+        setDeleteError('Failed to remove product. Please try again.');
+        return;
       }
-    } catch (err: any) {
-      alert(err.message);
+
+      // Remove from UI only after DB success
+      setProducts((prev) => prev.filter((p) => p.id !== deletingProduct.id));
+      setDeletingProduct(null);
+    } catch {
+      setDeleteError('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -261,11 +275,10 @@ export const InventoryPage: React.FC = () => {
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <button
               onClick={() => setLowStockOnly(!lowStockOnly)}
-              className={`text-xs px-3 py-2 rounded-xl border font-semibold flex items-center gap-1.5 transition-all ${
-                lowStockOnly
-                  ? 'bg-rose-50 border-rose-300 text-rose-700 dark:bg-rose-950/40 dark:border-rose-800 dark:text-rose-400'
-                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 hover:bg-slate-50'
-              }`}
+              className={`text-xs px-3 py-2 rounded-xl border font-semibold flex items-center gap-1.5 transition-all ${lowStockOnly
+                ? 'bg-rose-50 border-rose-300 text-rose-700 dark:bg-rose-950/40 dark:border-rose-800 dark:text-rose-400'
+                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 hover:bg-slate-50'
+                }`}
             >
               <AlertTriangle className="w-3.5 h-3.5" />
               Low Stock (&le; 5)
@@ -288,11 +301,10 @@ export const InventoryPage: React.FC = () => {
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1 scrollbar-none">
             <button
               onClick={() => setSelectedCategory('all')}
-              className={`text-xs px-3 py-1.5 rounded-lg whitespace-nowrap font-medium transition-all ${
-                selectedCategory === 'all'
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
-              }`}
+              className={`text-xs px-3 py-1.5 rounded-lg whitespace-nowrap font-medium transition-all ${selectedCategory === 'all'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                }`}
             >
               All Categories
             </button>
@@ -300,11 +312,10 @@ export const InventoryPage: React.FC = () => {
               <button
                 key={c}
                 onClick={() => setSelectedCategory(c)}
-                className={`text-xs px-3 py-1.5 rounded-lg whitespace-nowrap font-medium transition-all ${
-                  selectedCategory === c
-                    ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
-                }`}
+                className={`text-xs px-3 py-1.5 rounded-lg whitespace-nowrap font-medium transition-all ${selectedCategory === c
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                  }`}
               >
                 {c}
               </button>
@@ -334,14 +345,14 @@ export const InventoryPage: React.FC = () => {
             onAction={
               searchQuery || lowStockOnly || selectedCategory !== 'all'
                 ? () => {
-                    setSearchQuery('');
-                    setSelectedCategory('all');
-                    setLowStockOnly(false);
-                  }
+                  setSearchQuery('');
+                  setSelectedCategory('all');
+                  setLowStockOnly(false);
+                }
                 : () => {
-                    setEditingProduct(null);
-                    setIsProductModalOpen(true);
-                  }
+                  setEditingProduct(null);
+                  setIsProductModalOpen(true);
+                }
             }
           />
         </Card>
@@ -474,9 +485,12 @@ export const InventoryPage: React.FC = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleDeleteProduct(p)}
+                    onClick={() => {
+                      setDeleteError(null);
+                      setDeletingProduct(p);
+                    }}
                     className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40"
-                    title="Delete product"
+                    title="Remove product"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -512,6 +526,60 @@ export const InventoryPage: React.FC = () => {
         onClose={() => setHistoryProduct(null)}
         product={historyProduct}
       />
+
+      {/* Soft Delete Confirmation Dialog */}
+      {deletingProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-sm p-6 space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950/60 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5 text-rose-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
+                  Remove Product?
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  <span className="font-semibold text-slate-700 dark:text-slate-300">
+                    "{deletingProduct.name}"
+                  </span>{' '}
+                  will be removed from your active catalog and billing. All past sales,
+                  invoices, and stock movement history for this product are permanently preserved.
+                </p>
+              </div>
+            </div>
+
+            {deleteError && (
+              <p className="text-xs text-rose-600 bg-rose-50 dark:bg-rose-950/40 px-3 py-2 rounded-lg">
+                {deleteError}
+              </p>
+            )}
+
+            <div className="flex items-center justify-end gap-2 pt-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setDeletingProduct(null);
+                  setDeleteError(null);
+                }}
+                disabled={isDeleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                isLoading={isDeleting}
+                onClick={handleConfirmDeleteProduct}
+                className="bg-rose-600 hover:bg-rose-700 border-rose-600 hover:border-rose-700"
+              >
+                Yes, Remove
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
