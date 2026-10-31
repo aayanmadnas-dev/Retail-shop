@@ -40,12 +40,28 @@ export const AdminDashboard: React.FC = () => {
   const [editingBusiness, setEditingBusiness] = useState<Business | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
-  const fetchBusinesses = async () => {
-    setIsLoading(true);
-    const res = await adminService.getBusinesses();
-    setBusinesses(res.businesses || []);
+const fetchBusinesses = async () => {
+  setIsLoading(true);
+
+  try {
+    const res = await adminService.getBusinesses(
+      session?.access_token
+    );
+
+    if (res.error) {
+      console.error('Failed to fetch businesses:', res.error);
+      alert(`Business loading failed: ${res.error}`);
+      return;
+    }
+
+    setBusinesses(res.businesses);
+  } catch (error) {
+    console.error('Business fetching error:', error);
+    alert('Unable to load businesses. Please try again.');
+  } finally {
     setIsLoading(false);
-  };
+  }
+};
 
   useEffect(() => {
     fetchBusinesses();
