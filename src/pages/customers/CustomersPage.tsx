@@ -36,15 +36,21 @@ export const CustomersPage: React.FC = () => {
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [viewingCustomer, setViewingCustomer] = useState<Customer | null>(null);
 
+  // Confirmation dialog state
+  const [deletingCustomer, setDeletingCustomer] = useState<Customer | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
   const fetchData = async () => {
     if (!business?.id) return;
     setIsLoading(true);
     try {
-      // 1. Fetch customers
+      // 1. Fetch only ACTIVE customers
       const { data: customerData, error: custError } = await supabase
         .from('customers')
         .select('*')
         .eq('business_id', business.id)
+        .eq('is_active', true)
         .order('name', { ascending: true });
 
       if (custError) throw custError;
@@ -89,23 +95,31 @@ export const CustomersPage: React.FC = () => {
     fetchData();
   }, [business?.id]);
 
-  const handleDelete = async (customer: Customer) => {
-    if (!window.confirm(`Delete customer "${customer.name}"?`)) return;
+  // Soft delete: set is_active = false (preserves all history)
+  const handleConfirmDelete = async () => {
+    if (!deletingCustomer || !business?.id) return;
+    setIsDeleting(true);
+    setDeleteError(null);
 
     try {
       const { error } = await supabase
         .from('customers')
-        .delete()
-        .eq('id', customer.id)
-        .eq('business_id', business?.id);
+        .update({ is_active: false })
+        .eq('id', deletingCustomer.id)
+        .eq('business_id', business.id);
 
       if (error) {
-        alert(`Failed to delete customer: ${error.message}`);
-      } else {
-        setCustomers((prev) => prev.filter((c) => c.id !== customer.id));
+        setDeleteError('Failed to remove customer. Please try again.');
+        return;
       }
-    } catch (err: any) {
-      alert(err.message);
+
+      // Remove from UI only after DB success
+      setCustomers((prev) => prev.filter((c) => c.id !== deletingCustomer.id));
+      setDeletingCustomer(null);
+    } catch {
+      setDeleteError('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -352,9 +366,12 @@ export const CustomersPage: React.FC = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleDelete(c)}
+                    onClick={() => {
+                      setDeleteError(null);
+                      setDeletingCustomer(c);
+                    }}
                     className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40"
-                    title="Delete customer"
+                    title="Remove customer"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -362,6 +379,60 @@ export const CustomersPage: React.FC = () => {
               </Card>
             );
           })}
+        </div>
+      )}
+
+      {/* Soft Delete Confirmation Dialog */}
+      {deletingCustomer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-sm p-6 space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950/60 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5 text-rose-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
+                  Remove Customer?
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  <span className="font-semibold text-slate-700 dark:text-slate-300">
+                    "{deletingCustomer.name}"
+                  </span>{' '}
+                  will be removed from your customer directory. All their past invoices,
+                  purchase history, and ledger records are permanently preserved.
+                </p>
+              </div>
+            </div>
+
+            {deleteError && (
+              <p className="text-xs text-rose-600 bg-rose-50 dark:bg-rose-950/40 px-3 py-2 rounded-lg">
+                {deleteError}
+              </p>
+            )}
+
+            <div className="flex items-center justify-end gap-2 pt-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setDeletingCustomer(null);
+                  setDeleteError(null);
+                }}
+                disabled={isDeleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                isLoading={isDeleting}
+                onClick={handleConfirmDelete}
+                className="bg-rose-600 hover:bg-rose-700 border-rose-600 hover:border-rose-700"
+              >
+                Yes, Remove
+              </Button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -385,4 +456,3 @@ export const CustomersPage: React.FC = () => {
     </div>
   );
 };
-
