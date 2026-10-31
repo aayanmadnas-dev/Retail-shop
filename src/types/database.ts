@@ -18,6 +18,8 @@ export interface Profile {
   created_at: string;
 }
 
+export type ItemType = 'inventory' | 'service';
+
 export interface Product {
   id: string;
   business_id: string;
@@ -28,7 +30,8 @@ export interface Product {
   purchase_price: number;
   selling_price: number;
   stock_quantity: number;
-  unit: string; // 'pcs', 'kg', 'litre', 'box', 'meter', etc.
+  unit: string; // 'pcs', 'kg', 'litre', 'box', 'meter', 'service', 'hr', etc.
+  item_type?: ItemType; // 'inventory' (default) | 'service'
   created_at: string;
 }
 
@@ -70,10 +73,10 @@ export interface SaleItem {
   business_id: string;
   sale_id: string;
   product_id: string;
-  product_name: string;
   quantity: number;
   unit_price: number;
   total: number;
+  // Joined relation
   products?: Product;
 }
 
