@@ -586,6 +586,7 @@ export const BillingPage: React.FC = () => {
                   className="w-full h-10 px-3 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
                 />
               </div>
+            </div>
 
 
             {/* Cart Items List */}
