@@ -99,9 +99,12 @@ export const BusinessDashboard: React.FC = () => {
       .reduce((acc, s) => acc + (Number(s.total) || 0), 0);
   }, [sales]);
 
-  // Low Stock Items
+  // Low Stock Items (Physical inventory items only)
   const lowStockProducts = useMemo(() => {
-    return products.filter((p) => (Number(p.stock_quantity) || 0) <= 5);
+    return products.filter((p) => {
+      const isService = p.item_type === 'service' || p.category?.toLowerCase() === 'service';
+      return !isService && (Number(p.stock_quantity) || 0) <= 5;
+    });
   }, [products]);
 
   // Total Inventory Valuation
