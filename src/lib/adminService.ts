@@ -105,21 +105,47 @@ export const adminService = {
   /**
    * Fetch all registered businesses (Super Admin only)
    */
-  async getBusinesses(): Promise<{ businesses: Business[]; error?: string }> {
-    try {
-      const { data, error } = await supabase
-        .from('businesses')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        return { businesses: [], error: error.message };
-      }
-      return { businesses: (data as Business[]) || [] };
-    } catch (err: any) {
-      return { businesses: [], error: err.message };
+  
+async getBusinesses(token?: string): Promise<{
+  businesses: Business[];
+  error?: string;
+}> {
+  try {
+    if (!token) {
+      return {
+        businesses: [],
+        error: 'Admin session expired. Please log in again.',
+      };
     }
-  },
+
+    const response = await fetch('/api/admin/list-businesses', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        businesses: [],
+        error: result.error || 'Failed to fetch businesses',
+      };
+    }
+
+    return {
+      businesses: result.businesses || [],
+    };
+  } catch (err: any) {
+    console.error('getBusinesses error:', err);
+
+    return {
+      businesses: [],
+      error: err.message || 'Network error while fetching businesses',
+    };
+  }
+},
 
   /**
    * Setup initial Super Admin
