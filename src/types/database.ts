@@ -55,6 +55,7 @@ export interface Sale {
   id: string;
   business_id: string;
   customer_id: string | null;
+  customer_phone?: string | null;
   invoice_number: string;
   subtotal: number;
   discount: number;
