@@ -127,14 +127,20 @@ export const BillingPage: React.FC = () => {
     });
   }, [products, searchQuery, selectedCategory]);
 
+  // Helper to identify service / non-inventory items
+  const isServiceItem = (p: Product) =>
+    p.item_type === 'service' || p.category?.toLowerCase() === 'service';
+
   // Cart operations
   const addToCart = (product: Product) => {
     setErrorMessage(null);
     const existing = cart.find((item) => item.product.id === product.id);
     const currentQty = existing ? existing.quantity : 0;
     const availableStock = Number(product.stock_quantity) || 0;
+    const isService = isServiceItem(product);
 
-    if (currentQty + 1 > availableStock) {
+    // Only validate available stock for physical inventory items
+    if (!isService && currentQty + 1 > availableStock) {
       setErrorMessage(
         `Insufficient stock for "${product.name}". Only ${availableStock} ${product.unit} available.`
       );
@@ -176,8 +182,11 @@ export const BillingPage: React.FC = () => {
     const item = cart.find((i) => i.product.id === productId);
     if (!item) return;
 
+    const isService = isServiceItem(item.product);
     const availableStock = Number(item.product.stock_quantity) || 0;
-    if (newQty > availableStock) {
+
+    // Only validate available stock for physical inventory items
+    if (!isService && newQty > availableStock) {
       setErrorMessage(
         `Cannot exceed available stock of ${availableStock} ${item.product.unit}.`
       );
@@ -240,8 +249,10 @@ export const BillingPage: React.FC = () => {
       return;
     }
 
-    // Pre-flight stock verification
+    // Pre-flight stock verification (ONLY for physical inventory items)
     for (const item of cart) {
+      if (isServiceItem(item.product)) continue;
+
       const liveProduct = products.find((p) => p.id === item.product.id);
       const liveStock = Number(liveProduct?.stock_quantity) || 0;
       if (item.quantity > liveStock) {
@@ -279,29 +290,30 @@ export const BillingPage: React.FC = () => {
 
       const createdSale = saleData as Sale;
 
-     // 2. Insert Sale Items
-const saleItemsToInsert = cart.map((item) => ({
-  business_id: business.id,
-  sale_id: createdSale.id,
-  product_id: item.product.id,
+      // 2. Insert Sale Items (all items: products & services)
+      const saleItemsToInsert = cart.map((item) => ({
+        business_id: business.id,
+        sale_id: createdSale.id,
+        product_id: item.product.id,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        total: Math.round(item.total * 100) / 100,
+      }));
 
-  // Store product name as a historical snapshot
-  product_name: item.product.name,
+      const { error: itemsError } = await supabase
+        .from('sale_items')
+        .insert(saleItemsToInsert);
 
-  quantity: Number(item.quantity),
-  unit_price: Number(item.unit_price),
-  total: Math.round(item.total * 100) / 100,
-}));
+      if (itemsError) throw itemsError;
 
-const { error: itemsError } = await supabase
-  .from('sale_items')
-  .insert(saleItemsToInsert);
-
-if (itemsError) throw itemsError;
-
-      // 3. Deduct Stock & Insert Stock Movements
+      // 3. Deduct Stock & Insert Stock Movements ONLY for physical inventory products
       for (const item of cart) {
-        const remaining = (Number(item.product.stock_quantity) || 0) - item.quantity;
+        // Non-inventory / Service charges: Do NOT deduct stock and do NOT create stock movement!
+        if (isServiceItem(item.product)) {
+          continue;
+        }
+
+        const remaining = Math.max(0, (Number(item.product.stock_quantity) || 0) - item.quantity);
 
         // Update product stock
         await supabase
@@ -442,8 +454,9 @@ if (itemsError) throw itemsError;
           {/* Product Items Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-[60vh] overflow-y-auto pr-1">
             {filteredProducts.map((p) => {
+              const isService = isServiceItem(p);
               const stock = Number(p.stock_quantity) || 0;
-              const isOutOfStock = stock <= 0;
+              const isOutOfStock = !isService && stock <= 0;
               const cartItem = cart.find((i) => i.product.id === p.id);
 
               return (
@@ -462,9 +475,16 @@ if (itemsError) throw itemsError;
                 >
                   <div>
                     <div className="flex items-start justify-between gap-1 mb-1">
-                      <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 line-clamp-2">
-                        {p.name}
-                      </h4>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 line-clamp-2">
+                          {p.name}
+                        </h4>
+                        {isService && (
+                          <span className="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                            SERVICE
+                          </span>
+                        )}
+                      </div>
                       {cartItem && (
                         <span className="shrink-0 w-5 h-5 rounded-full bg-emerald-600 text-white text-[10px] font-bold flex items-center justify-center">
                           {cartItem.quantity}
@@ -484,10 +504,14 @@ if (itemsError) throw itemsError;
                     </span>
                     <span
                       className={`text-[10px] font-semibold ${
-                        isOutOfStock ? 'text-rose-600' : 'text-slate-400'
+                        isService
+                          ? 'text-blue-600 dark:text-blue-400 font-medium'
+                          : isOutOfStock
+                          ? 'text-rose-600'
+                          : 'text-slate-400'
                       }`}
                     >
-                      {isOutOfStock ? 'Out of Stock' : `${stock} ${p.unit}`}
+                      {isService ? 'Service Charge' : isOutOfStock ? 'Out of Stock' : `${stock} ${p.unit}`}
                     </span>
                   </div>
                 </button>
@@ -543,15 +567,24 @@ if (itemsError) throw itemsError;
                 </div>
               ) : (
                 <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
-                  {cart.map((item) => (
+                  {cart.map((item) => {
+                    const isServ = isServiceItem(item.product);
+                    return (
                     <div
                       key={item.product.id}
                       className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 text-xs"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="font-bold text-slate-800 dark:text-slate-200 truncate">
-                          {item.product.name}
-                        </p>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <p className="font-bold text-slate-800 dark:text-slate-200 truncate">
+                            {item.product.name}
+                          </p>
+                          {isServ && (
+                            <span className="text-[9px] px-1.5 py-0.2 rounded font-bold uppercase tracking-wider bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
+                              SERVICE
+                            </span>
+                          )}
+                        </div>
                         <p className="text-[11px] text-slate-400 font-mono">
                           {formatCurrency(item.unit_price)} x {item.quantity} {item.product.unit}
                         </p>
@@ -590,7 +623,8 @@ if (itemsError) throw itemsError;
                         {formatCurrency(item.total)}
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
