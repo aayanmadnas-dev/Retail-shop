@@ -111,6 +111,7 @@ CREATE TABLE IF NOT EXISTS public.sale_items (
     business_id UUID NOT NULL REFERENCES public.businesses(id) ON DELETE CASCADE,
     sale_id UUID NOT NULL REFERENCES public.sales(id) ON DELETE CASCADE,
     product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE RESTRICT,
+    product_name TEXT NOT NULL,
     quantity NUMERIC(12, 2) NOT NULL,
     unit_price NUMERIC(12, 2) NOT NULL,
     total NUMERIC(12, 2) NOT NULL
