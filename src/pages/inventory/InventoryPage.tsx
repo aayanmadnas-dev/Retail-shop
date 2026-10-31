@@ -107,33 +107,38 @@ export const InventoryPage: React.FC = () => {
         (p.sku && p.sku.toLowerCase().includes(q)) ||
         (p.barcode && p.barcode.toLowerCase().includes(q));
 
+      const isService = p.item_type === 'service' || p.category?.toLowerCase() === 'service';
       const matchesCategory =
         selectedCategory === 'all' || p.category === selectedCategory;
 
-      const matchesLowStock = !lowStockOnly || (Number(p.stock_quantity) || 0) <= 5;
+      const matchesLowStock = !lowStockOnly || (!isService && (Number(p.stock_quantity) || 0) <= 5);
 
       return matchesSearch && matchesCategory && matchesLowStock;
     });
   }, [products, searchQuery, selectedCategory, lowStockOnly]);
 
-  // Inventory valuation calculations
-  const totalStockUnits = useMemo(() => {
-    return products.reduce((acc, p) => acc + (Number(p.stock_quantity) || 0), 0);
+  // Inventory valuation calculations (calculated on physical inventory items only)
+  const inventoryItems = useMemo(() => {
+    return products.filter((p) => p.item_type !== 'service' && p.category?.toLowerCase() !== 'service');
   }, [products]);
 
+  const totalStockUnits = useMemo(() => {
+    return inventoryItems.reduce((acc, p) => acc + (Number(p.stock_quantity) || 0), 0);
+  }, [inventoryItems]);
+
   const totalPurchaseValuation = useMemo(() => {
-    return products.reduce(
+    return inventoryItems.reduce(
       (acc, p) => acc + (Number(p.stock_quantity) || 0) * (Number(p.purchase_price) || 0),
       0
     );
-  }, [products]);
+  }, [inventoryItems]);
 
   const totalRetailValuation = useMemo(() => {
-    return products.reduce(
+    return inventoryItems.reduce(
       (acc, p) => acc + (Number(p.stock_quantity) || 0) * (Number(p.selling_price) || 0),
       0
     );
-  }, [products]);
+  }, [inventoryItems]);
 
   const handleExportCSV = () => {
     const rows = filteredProducts.map((p) => ({
@@ -343,7 +348,8 @@ export const InventoryPage: React.FC = () => {
       ) : (
         <div className="space-y-3">
           {filteredProducts.map((p) => {
-            const isLowStock = (Number(p.stock_quantity) || 0) <= 5;
+            const isService = p.item_type === 'service' || p.category?.toLowerCase() === 'service';
+            const isLowStock = !isService && (Number(p.stock_quantity) || 0) <= 5;
             return (
               <Card
                 key={p.id}
@@ -355,9 +361,13 @@ export const InventoryPage: React.FC = () => {
                     <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 truncate">
                       {p.name}
                     </h3>
-                    {p.category && (
+                    {isService ? (
+                      <Badge variant="blue" size="sm">
+                        SERVICE
+                      </Badge>
+                    ) : (
                       <Badge variant="slate" size="sm">
-                        {p.category}
+                        {p.category || 'Product'}
                       </Badge>
                     )}
                     {isLowStock && (
@@ -371,14 +381,14 @@ export const InventoryPage: React.FC = () => {
                   {/* Pricing and identifiers */}
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
                     <div>
-                      Selling:{' '}
+                      Rate / Price:{' '}
                       <span className="font-bold text-slate-900 dark:text-slate-100 text-sm">
                         {formatCurrency(p.selling_price)}
                       </span>
                       <span className="text-[11px] text-slate-400"> / {p.unit}</span>
                     </div>
 
-                    {Number(p.purchase_price) > 0 && (
+                    {!isService && Number(p.purchase_price) > 0 && (
                       <div>
                         Cost:{' '}
                         <span className="font-medium text-slate-600 dark:text-slate-300">
@@ -387,49 +397,66 @@ export const InventoryPage: React.FC = () => {
                       </div>
                     )}
 
-                    {p.sku && <div>SKU: <span className="font-mono">{p.sku}</span></div>}
-                    {p.barcode && <div>Barcode: <span className="font-mono">{p.barcode}</span></div>}
+                    {!isService && p.sku && <div>SKU: <span className="font-mono">{p.sku}</span></div>}
+                    {!isService && p.barcode && <div>Barcode: <span className="font-mono">{p.barcode}</span></div>}
                   </div>
                 </div>
 
                 {/* Middle: Current stock pill */}
                 <div className="flex items-center gap-3">
                   <div className="text-left sm:text-right">
-                    <span className="text-[11px] text-slate-400 uppercase font-semibold block">
-                      In Stock
-                    </span>
-                    <span
-                      className={`text-lg font-bold font-mono ${
-                        isLowStock ? 'text-rose-600' : 'text-emerald-600 dark:text-emerald-400'
-                      }`}
-                    >
-                      {p.stock_quantity} <span className="text-xs font-normal">{p.unit}</span>
-                    </span>
+                    {isService ? (
+                      <div>
+                        <span className="text-[10px] text-blue-600 dark:text-blue-400 uppercase font-semibold block">
+                          Non-Inventory
+                        </span>
+                        <span className="text-xs font-medium text-slate-500">
+                          No stock tracking
+                        </span>
+                      </div>
+                    ) : (
+                      <div>
+                        <span className="text-[11px] text-slate-400 uppercase font-semibold block">
+                          In Stock
+                        </span>
+                        <span
+                          className={`text-lg font-bold font-mono ${
+                            isLowStock ? 'text-rose-600' : 'text-emerald-600 dark:text-emerald-400'
+                          }`}
+                        >
+                          {p.stock_quantity} <span className="text-xs font-normal">{p.unit}</span>
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Right: Actions */}
                 <div className="flex items-center gap-1.5 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-slate-800">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setAdjustingProduct(p)}
-                    className="gap-1.5 text-xs text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
-                    title="Adjust or restock quantity"
-                  >
-                    <ArrowUpDown className="w-3.5 h-3.5" />
-                    Adjust Stock
-                  </Button>
+                  {!isService && (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setAdjustingProduct(p)}
+                        className="gap-1.5 text-xs text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
+                        title="Adjust or restock quantity"
+                      >
+                        <ArrowUpDown className="w-3.5 h-3.5" />
+                        Adjust Stock
+                      </Button>
 
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setHistoryProduct(p)}
-                    className="p-2 text-slate-500 hover:text-slate-700"
-                    title="Audit trail of stock movements"
-                  >
-                    <History className="w-4 h-4" />
-                  </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setHistoryProduct(p)}
+                        className="p-2 text-slate-500 hover:text-slate-700"
+                        title="Audit trail of stock movements"
+                      >
+                        <History className="w-4 h-4" />
+                      </Button>
+                    </>
+                  )}
 
                   <Button
                     variant="ghost"
@@ -439,7 +466,7 @@ export const InventoryPage: React.FC = () => {
                       setIsProductModalOpen(true);
                     }}
                     className="p-2 text-slate-500 hover:text-slate-700"
-                    title="Edit product"
+                    title="Edit item"
                   >
                     <Edit2 className="w-4 h-4" />
                   </Button>
