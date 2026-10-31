@@ -73,10 +73,10 @@ export interface SaleItem {
   business_id: string;
   sale_id: string;
   product_id: string;
+  product_name: string;
   quantity: number;
   unit_price: number;
   total: number;
-  // Joined relation
   products?: Product;
 }
 
