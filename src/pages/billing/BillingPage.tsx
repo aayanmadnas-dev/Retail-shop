@@ -280,6 +280,7 @@ export const BillingPage: React.FC = () => {
         .insert({
           business_id: business.id,
           customer_id: selectedCustomer ? selectedCustomer.id : null,
+          customer_phone: customerPhone.trim() || null,
           invoice_number: invoiceNumber,
           subtotal: Math.round(subtotal * 100) / 100,
           discount: Math.round(discountAmount * 100) / 100,
