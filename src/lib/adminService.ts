@@ -125,7 +125,17 @@ async getBusinesses(token?: string): Promise<{
       },
     });
 
-    const result = await response.json();
+    const responseText = await response.text();
+
+let result;
+
+try {
+  result = JSON.parse(responseText);
+} catch {
+  throw new Error(
+    `API returned invalid JSON (HTTP ${response.status}). Check Vercel deployment and API route.`
+  );
+}
 
     if (!response.ok) {
       return {
