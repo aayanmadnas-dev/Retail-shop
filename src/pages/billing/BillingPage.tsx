@@ -46,7 +46,10 @@ export const BillingPage: React.FC = () => {
   // Cart State
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('walk-in');
+  const [customerPhone, setCustomerPhone] = useState('');
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
+
+  
 
   // Pricing Modifiers
   const [discountType, setDiscountType] = useState<'flat' | 'percentage'>('flat');
@@ -239,7 +242,9 @@ export const BillingPage: React.FC = () => {
   const selectedCustomer = useMemo(() => {
     if (selectedCustomerId === 'walk-in') return null;
     return customers.find((c) => c.id === selectedCustomerId) || null;
-  }, [customers, selectedCustomerId]);
+  },useEffect(() => {
+  setCustomerPhone(selectedCustomer?.phone || '');
+}, [selectedCustomer]); [customers, selectedCustomerId]);
 
   // Complete Checkout / Generate Invoice
   const handleCheckout = async () => {
@@ -548,6 +553,19 @@ export const BillingPage: React.FC = () => {
                 onChange={(e) => setSelectedCustomerId(e.target.value)}
                 className="w-full h-10 px-3 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
               >
+                <div className="space-y-1">
+  <label className="text-xs font-semibold text-slate-500">
+    Customer WhatsApp Number
+  </label>
+
+  <input
+    type="tel"
+    value={customerPhone}
+    onChange={(e) => setCustomerPhone(e.target.value)}
+    placeholder="Enter mobile number (e.g. 9876543210)"
+    className="w-full h-10 px-3 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+  />
+</div>
                 <option value="walk-in">Walk-in Customer (Unregistered)</option>
                 {customers.map((c) => (
                   <option key={c.id} value={c.id}>
