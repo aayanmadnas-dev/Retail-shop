@@ -202,7 +202,11 @@ Thank you!`;
             <div className="text-right">
               <span className="text-[10px] text-slate-400 font-semibold uppercase">Billed To</span>
               <p className="font-bold text-slate-900">{customer?.name || 'Walk-in Customer'}</p>
-              {customer?.phone && <p className="text-slate-500">{customer.phone}</p>}
+              {(sale.customer_phone || customer?.phone) && (
+  <p className="text-slate-500">
+    {sale.customer_phone || customer?.phone}
+  </p>
+)}
               {customer?.address && <p className="text-slate-500 truncate">{customer.address}</p>}
             </div>
           </div>
