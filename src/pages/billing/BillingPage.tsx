@@ -290,16 +290,25 @@ export const BillingPage: React.FC = () => {
 
       const createdSale = saleData as Sale;
 
-      // 2. Insert Sale Items (all items: products & services)
-     const saleItems = cart.map((item) => ({
-  business_id: businessId,
-  sale_id: sale.id,
-  product_id: item.id,
-  product_name: item.name,
-  quantity: item.quantity,
-  unit_price: item.selling_price,
-  total: item.selling_price * item.quantity,
-}));
+     
+      // 2. Insert Sale Items (products and services)
+      const saleItemsToInsert = cart.map((item) => ({
+        business_id: business.id,
+        sale_id: createdSale.id,
+        product_id: item.product.id,
+        product_name: item.product.name,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        total: Math.round(item.total * 100) / 100,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('sale_items')
+        .insert(saleItemsToInsert);
+
+      if (itemsError) {
+        throw new Error(`Failed to save sale items: ${itemsError.message}`);
+      }
 
       // 3. Deduct Stock & Insert Stock Movements ONLY for physical inventory products
       for (const item of cart) {
