@@ -118,7 +118,7 @@ async getBusinesses(token?: string): Promise<{
       };
     }
 
-    const response = await fetch('/api/admin/list-businesses', {
+   const response = await fetch('/api/admin/list-business', {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
