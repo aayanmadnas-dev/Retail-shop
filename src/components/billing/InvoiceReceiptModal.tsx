@@ -28,34 +28,136 @@ export const InvoiceReceiptModal: React.FC<InvoiceReceiptModalProps> = ({
     window.print();
   };
 
+  const generateInvoicePdf = async () => {
+    const element = document.getElementById('printable-invoice');
+
+    if (!element) {
+      throw new Error('Invoice receipt not found');
+    }
+
+    const html2canvas = (await import('html2canvas')).default;
+    const { jsPDF } = await import('jspdf');
+
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+    });
+
+    const imageData = canvas.toDataURL('image/png');
+
+    const pdf = new jsPDF('p', 'mm', 'a4');
+
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    const image = pdf.getImageProperties(imageData);
+
+    const availableWidth = pageWidth - 20;
+    const availableHeight = pageHeight - 20;
+
+    const scale = Math.min(
+      availableWidth / image.width,
+      availableHeight / image.height
+    );
+
+    const width = image.width * scale;
+    const height = image.height * scale;
+
+    pdf.addImage(
+      imageData,
+      'PNG',
+      (pageWidth - width) / 2,
+      10,
+      width,
+      height
+    );
+
+    return pdf;
+  };
+
+  // Download invoice PDF
+  const handleDownloadPDF = async () => {
+    try {
+      const pdf = await generateInvoicePdf();
+
+      pdf.save(`Invoice-${sale.invoice_number}.pdf`);
+    } catch (error) {
+      console.error('PDF generation failed:', error);
+      alert('Unable to generate invoice PDF.');
+    }
+  };
+
+  // Share actual PDF using the phone's native sharing menu
+  const handleSharePDF = async () => {
+    try {
+      const pdf = await generateInvoicePdf();
+
+      const blob = pdf.output('blob');
+
+      const file = new File(
+        [blob],
+        `Invoice-${sale.invoice_number}.pdf`,
+        { type: 'application/pdf' }
+      );
+
+      if (
+        typeof navigator.share === 'function' &&
+        typeof navigator.canShare === 'function' &&
+        navigator.canShare({ files: [file] })
+      ) {
+        await navigator.share({
+          files: [file],
+          title: `Invoice ${sale.invoice_number}`,
+          text: `Invoice from ${business?.name || 'RetailFlow Store'}`,
+        });
+      } else {
+        pdf.save(`Invoice-${sale.invoice_number}.pdf`);
+
+        alert(
+          'PDF downloaded. Open WhatsApp and attach the downloaded invoice.'
+        );
+      }
+    } catch (error: any) {
+      if (error.name !== 'AbortError') {
+        console.error('PDF sharing failed:', error);
+        alert('Unable to share PDF. Please download it instead.');
+      }
+    }
+  };
+
+  // Open the specific customer's WhatsApp chat
   const handleShareWhatsApp = () => {
-    const text = `*Tax Invoice from ${business?.name || 'RetailFlow Store'}*
-Invoice No: ${sale.invoice_number}
-Date: ${formatDate(sale.created_at, true)}
-Customer: ${customer?.name || 'Walk-in Customer'}
-Total Amount: ${formatCurrency(sale.total)}
-Payment: ${sale.payment_method.toUpperCase()} (${sale.payment_status.toUpperCase()})
+    const rawPhone = sale.customer_phone || customer?.phone || '';
+    let phone = rawPhone.replace(/\D/g, '');
 
-Thank you for shopping with us!`;
+    // Automatically add India's country code for 10-digit numbers
+    if (phone.length === 10) {
+      phone = `91${phone}`;
+    }
 
-    const url = `https://wa.me/${customer?.phone ? `91${customer.phone.replace(/\D/g, '')}` : ''}?text=${encodeURIComponent(text)}`;
+    if (phone.length < 10 || phone.length > 15) {
+      alert('Please enter a valid customer WhatsApp number.');
+      return;
+    }
+
+    const message = `Hello ${customer?.name || 'Customer'},
+
+Thank you for shopping at ${business?.name || 'our store'}.
+
+Your invoice number is ${sale.invoice_number}.
+Total Amount: ${formatCurrency(sale.total)}.
+
+Please find your invoice PDF attached.
+
+Thank you!`;
+
+    const url =
+      `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
     window.open(url, '_blank');
   };
 
-  const handleWebShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `Invoice ${sale.invoice_number} - ${business?.name}`,
-          text: `Invoice ${sale.invoice_number} from ${business?.name}. Total: ${formatCurrency(sale.total)}`,
-        });
-      } catch (err) {
-        console.error('Error sharing:', err);
-      }
-    } else {
-      handleShareWhatsApp();
-    }
-  };
 
   return (
     <Modal
@@ -183,37 +285,64 @@ Thank you for shopping with us!`;
         </div>
 
         {/* Action Buttons (Excluded from print) */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 no-print">
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="md"
-              onClick={handlePrint}
-              className="gap-1.5"
-            >
-              <Printer className="w-4 h-4" />
-              Print Invoice
-            </Button>
+        
+<div className="flex flex-wrap items-center justify-between gap-2 pt-2 no-print">
+  <div className="flex flex-wrap items-center gap-2">
 
-            <Button
-              type="button"
-              variant="outline"
-              size="md"
-              onClick={handleShareWhatsApp}
-              className="gap-1.5 text-emerald-700 border-emerald-200 hover:bg-emerald-50"
-            >
-              <MessageCircle className="w-4 h-4 text-emerald-600" />
-              WhatsApp
-            </Button>
-          </div>
+    <Button
+      type="button"
+      variant="outline"
+      size="md"
+      onClick={handlePrint}
+      className="gap-1.5"
+    >
+      <Printer className="w-4 h-4" />
+      Print
+    </Button>
 
-          <Button type="button" variant="primary" size="md" onClick={onClose}>
-            New Bill
-          </Button>
-        </div>
-      </div>
-    </Modal>
-  );
-};
+    <Button
+      type="button"
+      variant="outline"
+      size="md"
+      onClick={handleDownloadPDF}
+      className="gap-1.5"
+    >
+      <Download className="w-4 h-4" />
+      Download PDF
+    </Button>
+
+    <Button
+      type="button"
+      variant="primary"
+      size="md"
+      onClick={handleSharePDF}
+      className="gap-1.5"
+    >
+      <Share2 className="w-4 h-4" />
+      Share PDF
+    </Button>
+
+    <Button
+      type="button"
+      variant="outline"
+      size="md"
+      onClick={handleShareWhatsApp}
+      className="gap-1.5 text-emerald-700 border-emerald-200"
+    >
+      <MessageCircle className="w-4 h-4" />
+      WhatsApp Chat
+    </Button>
+
+  </div>
+
+  <Button
+    type="button"
+    variant="primary"
+    size="md"
+    onClick={onClose}
+  >
+    New Bill
+  </Button>
+</div>
+
 
