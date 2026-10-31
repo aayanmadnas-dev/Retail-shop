@@ -302,6 +302,7 @@ export const BillingPage: React.FC = () => {
 
      
       // 2. Insert Sale Items (products and services)
+
       const saleItemsToInsert = cart.map((item) => ({
         business_id: business.id,
         sale_id: createdSale.id,
@@ -317,7 +318,9 @@ export const BillingPage: React.FC = () => {
         .insert(saleItemsToInsert);
 
       if (itemsError) {
-        throw new Error(`Failed to save sale items: ${itemsError.message}`);
+        throw new Error(
+          `Failed to save sale items: ${itemsError.message}`
+        );
       }
 
       // 3. Deduct Stock & Insert Stock Movements ONLY for physical inventory products
