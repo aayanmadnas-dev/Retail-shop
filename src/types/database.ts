@@ -32,6 +32,7 @@ export interface Product {
   stock_quantity: number;
   unit: string; // 'pcs', 'kg', 'litre', 'box', 'meter', 'service', 'hr', etc.
   item_type?: ItemType; // 'inventory' (default) | 'service'
+  is_active: boolean; // Soft delete — false means archived/removed from catalog
   created_at: string;
 }
 
@@ -41,6 +42,7 @@ export interface Customer {
   name: string;
   phone: string | null;
   address: string | null;
+  is_active: boolean; // Soft delete — false means archived/removed from directory
   created_at: string;
   // Computed client-side / joined
   total_purchases?: number;
@@ -100,4 +102,3 @@ export interface CartItem {
   unit_price: number;
   total: number;
 }
-
