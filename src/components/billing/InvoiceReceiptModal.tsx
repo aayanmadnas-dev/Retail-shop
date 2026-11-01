@@ -35,7 +35,7 @@ export const InvoiceReceiptModal: React.FC<InvoiceReceiptModalProps> = ({
       throw new Error('Invoice receipt not found');
     }
 
-    const html2canvas = (await import('html2canvas')).default;
+    const html2canvas = (await import('html2canvas-pro')).default;
     const { jsPDF } = await import('jspdf');
 
     const canvas = await html2canvas(element, {
