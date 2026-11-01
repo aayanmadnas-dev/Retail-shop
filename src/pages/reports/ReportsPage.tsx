@@ -201,6 +201,7 @@ export const ReportsPage: React.FC = () => {
           selling_price: i.unit_price,
           stock_quantity: 0,
           unit: i.products?.unit || 'pcs',
+          is_active: true,
           created_at: sale.created_at,
         },
         quantity: i.quantity,
@@ -211,6 +212,7 @@ export const ReportsPage: React.FC = () => {
     setSelectedSale(sale);
     setSelectedCartItems(itemsForSale);
   };
+
 
   const handleExportCSV = () => {
     const rows = filteredSales.map((s) => ({
@@ -288,19 +290,18 @@ export const ReportsPage: React.FC = () => {
               <button
                 key={r}
                 onClick={() => setTimeRange(r)}
-                className={`text-xs px-3 py-1.5 rounded-lg capitalize font-medium transition-all ${
-                  timeRange === r
+                className={`text-xs px-3 py-1.5 rounded-lg capitalize font-medium transition-all ${timeRange === r
                     ? 'bg-emerald-600 text-white shadow-xs'
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
-                }`}
+                  }`}
               >
                 {r === 'today'
                   ? 'Daily'
                   : r === 'week'
-                  ? 'Weekly (7d)'
-                  : r === 'month'
-                  ? 'This Month'
-                  : 'Custom'}
+                    ? 'Weekly (7d)'
+                    : r === 'month'
+                      ? 'This Month'
+                      : 'Custom'}
               </button>
             ))}
           </div>
@@ -504,8 +505,8 @@ export const ReportsPage: React.FC = () => {
                         s.payment_status === 'paid'
                           ? 'emerald'
                           : s.payment_status === 'partial'
-                          ? 'amber'
-                          : 'rose'
+                            ? 'amber'
+                            : 'rose'
                       }
                       size="sm"
                     >
