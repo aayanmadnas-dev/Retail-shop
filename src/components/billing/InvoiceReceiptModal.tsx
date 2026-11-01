@@ -35,7 +35,7 @@ export const InvoiceReceiptModal: React.FC<InvoiceReceiptModalProps> = ({
       throw new Error('Invoice receipt not found');
     }
 
-    const html2canvas = (await import('html2canvas-pro')).default;
+    const html2canvas = (await import('html2canvas')).default;
     const { jsPDF } = await import('jspdf');
 
     const canvas = await html2canvas(element, {
@@ -82,10 +82,17 @@ export const InvoiceReceiptModal: React.FC<InvoiceReceiptModalProps> = ({
       const pdf = await generateInvoicePdf();
 
       pdf.save(`Invoice-${sale.invoice_number}.pdf`);
-    } catch (error) {
-      console.error('PDF generation failed:', error);
-      alert('Unable to generate invoice PDF.');
-    }
+    } 
+    catch (error) {
+  console.error('PDF generation failed:', error);
+
+  const message =
+    error instanceof Error
+      ? error.message
+      : String(error);
+
+  alert(`PDF generation failed: ${message}`);
+}
   };
 
   // Share actual PDF using the phone's native sharing menu
@@ -288,65 +295,67 @@ Thank you!`;
           </div>
         </div>
 
-        {/* Action Buttons (Excluded from print) */}
-        
-<div className="flex flex-wrap items-center justify-between gap-2 pt-2 no-print">
-  <div className="flex flex-wrap items-center gap-2">
+               {/* Action Buttons (Excluded from print) */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 no-print">
+          <div className="flex flex-wrap items-center gap-2">
 
-    <Button
-      type="button"
-      variant="outline"
-      size="md"
-      onClick={handlePrint}
-      className="gap-1.5"
-    >
-      <Printer className="w-4 h-4" />
-      Print
-    </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="md"
+              onClick={handlePrint}
+              className="gap-1.5"
+            >
+              <Printer className="w-4 h-4" />
+              Print
+            </Button>
 
-    <Button
-      type="button"
-      variant="outline"
-      size="md"
-      onClick={handleDownloadPDF}
-      className="gap-1.5"
-    >
-      <Download className="w-4 h-4" />
-      Download PDF
-    </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="md"
+              onClick={handleDownloadPDF}
+              className="gap-1.5"
+            >
+              <Download className="w-4 h-4" />
+              Download PDF
+            </Button>
 
-    <Button
-      type="button"
-      variant="primary"
-      size="md"
-      onClick={handleSharePDF}
-      className="gap-1.5"
-    >
-      <Share2 className="w-4 h-4" />
-      Share PDF
-    </Button>
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              onClick={handleSharePDF}
+              className="gap-1.5"
+            >
+              <Share2 className="w-4 h-4" />
+              Share PDF
+            </Button>
 
-    <Button
-      type="button"
-      variant="outline"
-      size="md"
-      onClick={handleShareWhatsApp}
-      className="gap-1.5 text-emerald-700 border-emerald-200"
-    >
-      <MessageCircle className="w-4 h-4" />
-      WhatsApp Chat
-    </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="md"
+              onClick={handleShareWhatsApp}
+              className="gap-1.5 text-emerald-700 border-emerald-200"
+            >
+              <MessageCircle className="w-4 h-4" />
+              WhatsApp Chat
+            </Button>
 
-  </div>
+          </div>
 
-  <Button
-    type="button"
-    variant="primary"
-    size="md"
-    onClick={onClose}
-  >
-    New Bill
-  </Button>
-</div>
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            onClick={onClose}
+          >
+            New Bill
+          </Button>
+        </div>
 
-
+      </div>
+    </Modal>
+  );
+};
