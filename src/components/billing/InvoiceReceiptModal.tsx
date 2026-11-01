@@ -82,10 +82,17 @@ export const InvoiceReceiptModal: React.FC<InvoiceReceiptModalProps> = ({
       const pdf = await generateInvoicePdf();
 
       pdf.save(`Invoice-${sale.invoice_number}.pdf`);
-    } catch (error) {
-      console.error('PDF generation failed:', error);
-      alert('Unable to generate invoice PDF.');
-    }
+    } 
+    catch (error) {
+  console.error('PDF generation failed:', error);
+
+  const message =
+    error instanceof Error
+      ? error.message
+      : String(error);
+
+  alert(`PDF generation failed: ${message}`);
+}
   };
 
   // Share actual PDF using the phone's native sharing menu
