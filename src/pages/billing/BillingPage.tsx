@@ -83,6 +83,7 @@ export const BillingPage: React.FC = () => {
           .from('products')
           .select('*')
           .eq('business_id', business.id)
+          .eq('is_active', true)
           .order('name', { ascending: true }),
         supabase
           .from('customers')
