@@ -129,9 +129,41 @@ export const ReportsPage: React.FC = () => {
   }, [sales, timeRange, startDate, endDate, searchQuery]);
 
   // Metric Computations
-  const totalRevenue = useMemo(() => {
+  const totalSales = useMemo(() => {
     return filteredSales.reduce((acc, s) => acc + (Number(s.total) || 0), 0);
   }, [filteredSales]);
+
+  
+const totalGrossProfit = useMemo(() => {
+  const salesMap = new Map(
+    filteredSales.map((sale) => [sale.id, sale])
+  );
+
+  return saleItems.reduce((profit, item) => {
+    const sale = salesMap.get(item.sale_id);
+
+    if (!sale) return profit;
+
+    const lineTotal = Number(item.total) || 0;
+    const quantity = Number(item.quantity) || 0;
+    const costPrice =
+      Number(item.purchase_price_at_sale) || 0;
+
+    const subtotal = Number(sale.subtotal) || 0;
+    const discount = Number(sale.discount) || 0;
+
+    const allocatedDiscount =
+      subtotal > 0
+        ? (discount * lineTotal) / subtotal
+        : 0;
+
+    const netSales = lineTotal - allocatedDiscount;
+    const totalCost = quantity * costPrice;
+
+    return profit + netSales - totalCost;
+  }, 0);
+}, [filteredSales, saleItems]);
+
 
   const totalTransactions = filteredSales.length;
 
@@ -345,7 +377,7 @@ export const ReportsPage: React.FC = () => {
       </Card>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
           <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
             Total Revenue
@@ -354,6 +386,16 @@ export const ReportsPage: React.FC = () => {
             {formatCurrency(totalRevenue)}
           </p>
         </div>
+
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
+  <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
+    Gross Profit
+  </span>
+
+  <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
+    {formatCurrency(totalGrossProfit)}
+  </p>
+</div>
 
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
           <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
