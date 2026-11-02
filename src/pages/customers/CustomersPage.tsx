@@ -70,10 +70,12 @@ export const CustomersPage: React.FC = () => {
       const enriched = custs.map((c) => {
         const cSales = sls.filter((s) => s.customer_id === c.id);
         const totalPurchases = cSales.reduce((acc, s) => acc + (Number(s.total) || 0), 0);
-        const outstanding = cSales
-          .filter((s) => s.payment_status === 'unpaid' || s.payment_status === 'partial')
-          .reduce((acc, s) => acc + (Number(s.total) || 0), 0);
+       const outstanding = cSales.reduce((acc, sale) => {
+  const total = Number(sale.total) || 0;
+  const paid = Number(sale.paid_amount) || 0;
 
+  return acc + Math.max(0, total - paid);
+}, 0);
         return {
           ...c,
           total_purchases: totalPurchases,
