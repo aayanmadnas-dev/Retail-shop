@@ -35,11 +35,19 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
+import type {
+  Sale,
+  SaleItem,
+  Product,
+  Customer
+} from '../../types/database';
+
 export const BusinessDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { business } = useAuth();
 
   const [sales, setSales] = useState<Sale[]>([]);
+  const [saleItems, setSaleItems] = useState<SaleItem[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -57,9 +65,14 @@ export const BusinessDashboard: React.FC = () => {
             .eq('business_id', business.id)
             .order('created_at', { ascending: false }),
           supabase
+            .from('sale_items')
+            .select('sale_id, quantity, total, purchase_price_at_sale')
+            .eq('business_id', business.id),
+          supabase
             .from('products')
             .select('*')
             .eq('business_id', business.id),
+            .eq('is_active', true)
           supabase
             .from('customers')
             .select('*')
@@ -67,6 +80,7 @@ export const BusinessDashboard: React.FC = () => {
         ]);
 
         if (salesRes.data) setSales(salesRes.data as Sale[]);
+        if (itemsRes.data) setSaleItems(itemsRes.data as SaleItem[]);
         if (prodRes.data) setProducts(prodRes.data as Product[]);
         if (custRes.data) setCustomers(custRes.data as Customer[]);
       } catch (err) {
@@ -98,6 +112,50 @@ export const BusinessDashboard: React.FC = () => {
       .filter((s) => new Date(s.created_at) >= startOfMonth)
       .reduce((acc, s) => acc + (Number(s.total) || 0), 0);
   }, [sales]);
+
+  
+const monthlyGrossProfit = useMemo(() => {
+  const now = new Date();
+  const startOfMonth = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    1
+  );
+
+  const monthlySalesList = sales.filter(
+    (s) => new Date(s.created_at) >= startOfMonth
+  );
+
+  const salesMap = new Map(
+    monthlySalesList.map((sale) => [sale.id, sale])
+  );
+
+  return saleItems.reduce((profit, item) => {
+    const sale = salesMap.get(item.sale_id);
+
+    if (!sale) return profit;
+
+    const lineTotal = Number(item.total) || 0;
+    const quantity = Number(item.quantity) || 0;
+    const costPrice =
+      Number(item.purchase_price_at_sale) || 0;
+
+    // Allocate invoice discount proportionally.
+    const subtotal = Number(sale.subtotal) || 0;
+    const discount = Number(sale.discount) || 0;
+
+    const allocatedDiscount =
+      subtotal > 0
+        ? (discount * lineTotal) / subtotal
+        : 0;
+
+    const netSales = lineTotal - allocatedDiscount;
+    const totalCost = quantity * costPrice;
+
+    return profit + netSales - totalCost;
+  }, 0);
+}, [sales, saleItems]);
+
 
   // Low Stock Items (Physical inventory items only)
   const lowStockProducts = useMemo(() => {
@@ -187,15 +245,15 @@ export const BusinessDashboard: React.FC = () => {
           onClick={() => navigate('/reports')}
         />
 
-        <StatCard
-          title="Monthly Revenue"
-          value={formatCurrency(monthlySales)}
-          subtitle="Current calendar month"
-          icon={<Calendar className="w-5 h-5" />}
-          iconBgColor="bg-blue-50 dark:bg-blue-950/40"
-          iconColor="text-blue-600 dark:text-blue-400"
-          onClick={() => navigate('/reports')}
-        />
+       <StatCard
+        title="Monthly Gross Profit"
+        value={formatCurrency(monthlyGrossProfit)}
+        subtitle="Sales minus product costs"
+        icon={<TrendingUp className="w-5 h-5" />}
+        iconBgColor="bg-emerald-50 dark:bg-emerald-950/40"
+        iconColor="text-emerald-600 dark:text-emerald-400"
+        onClick={() => navigate('/reports')}
+      />
 
         <StatCard
           title="Total Products"
