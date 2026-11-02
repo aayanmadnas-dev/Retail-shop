@@ -291,6 +291,10 @@ export const BillingPage: React.FC = () => {
           discount: Math.round(discountAmount * 100) / 100,
           tax_amount: Math.round(taxAmount * 100) / 100,
           total: Math.round(grandTotal * 100) / 100,
+          paid_amount:
+  paymentStatus === 'paid'
+    ? Math.round(grandTotal * 100) / 100
+    : 0,
           payment_method: paymentMethod,
           payment_status: paymentStatus,
         })
