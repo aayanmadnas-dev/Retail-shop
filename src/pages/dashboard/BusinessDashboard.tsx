@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
-import type { Sale, Product, Customer } from '../../types/database';
+import type { Sale, SaleItem, Product, Customer} from '../../types/database';
 import { StatCard } from '../../components/ui/StatCard';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -35,13 +35,6 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-import type {
-  Sale,
-  SaleItem,
-  Product,
-  Customer
-} from '../../types/database';
-
 export const BusinessDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { business } = useAuth();
@@ -58,31 +51,39 @@ export const BusinessDashboard: React.FC = () => {
 
     const fetchData = async () => {
       try {
-        const [salesRes, prodRes, custRes] = await Promise.all([
-          supabase
-            .from('sales')
-            .select('*, customers(name)')
-            .eq('business_id', business.id)
-            .order('created_at', { ascending: false }),
-          supabase
-            .from('sale_items')
-            .select('sale_id, quantity, total, purchase_price_at_sale')
-            .eq('business_id', business.id),
-          supabase
-            .from('products')
-            .select('*')
-            .eq('business_id', business.id),
-            .eq('is_active', true)
-          supabase
-            .from('customers')
-            .select('*')
-            .eq('business_id', business.id),
-        ]);
+        const [salesRes, itemsRes, prodRes, custRes] = await Promise.all([
+  supabase
+    .from('sales')
+    .select('*, customers(name)')
+    .eq('business_id', business.id)
+    .order('created_at', { ascending: false }),
 
-        if (salesRes.data) setSales(salesRes.data as Sale[]);
-        if (itemsRes.data) setSaleItems(itemsRes.data as SaleItem[]);
-        if (prodRes.data) setProducts(prodRes.data as Product[]);
-        if (custRes.data) setCustomers(custRes.data as Customer[]);
+  supabase
+    .from('sale_items')
+    .select('sale_id, quantity, total, purchase_price_at_sale')
+    .eq('business_id', business.id),
+
+  supabase
+    .from('products')
+    .select('*')
+    .eq('business_id', business.id)
+    .eq('is_active', true),
+
+  supabase
+    .from('customers')
+    .select('*')
+    .eq('business_id', business.id),
+]);
+
+if (salesRes.error) throw salesRes.error;
+if (itemsRes.error) throw itemsRes.error;
+if (prodRes.error) throw prodRes.error;
+if (custRes.error) throw custRes.error;
+
+setSales((salesRes.data || []) as Sale[]);
+setSaleItems((itemsRes.data || []) as SaleItem[]);
+setProducts((prodRes.data || []) as Product[]);
+setCustomers((custRes.data || []) as Customer[]);
       } catch (err) {
         console.error('Error loading dashboard data:', err);
       } finally {
