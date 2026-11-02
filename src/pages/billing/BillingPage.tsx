@@ -304,15 +304,22 @@ export const BillingPage: React.FC = () => {
      
       // 2. Insert Sale Items (products and services)
 
-      const saleItemsToInsert = cart.map((item) => ({
-        business_id: business.id,
-        sale_id: createdSale.id,
-        product_id: item.product.id,
-        product_name: item.product.name,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        total: Math.round(item.total * 100) / 100,
-      }));
+      
+const saleItemsToInsert = cart.map((item) => ({
+  business_id: business.id,
+  sale_id: createdSale.id,
+  product_id: item.product.id,
+  product_name: item.product.name,
+  quantity: item.quantity,
+  unit_price: item.unit_price,
+
+  // Store immutable cost price at the time of sale.
+  purchase_price_at_sale:
+    Number(item.product.purchase_price) || 0,
+
+  total: Math.round(item.total * 100) / 100,
+}));
+
 
       const { error: itemsError } = await supabase
         .from('sale_items')
