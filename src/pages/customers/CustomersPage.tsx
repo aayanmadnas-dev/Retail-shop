@@ -57,9 +57,9 @@ export const CustomersPage: React.FC = () => {
 
       // 2. Fetch sales to calculate purchase totals and balances
       const { data: salesData, error: salesError } = await supabase
-        .from('sales')
-        .select('customer_id, total, payment_status')
-        .eq('business_id', business.id);
+  .from('sales')
+  .select('customer_id, total, payment_status, paid_amount')
+  .eq('business_id', business.id);
 
       if (salesError) console.error('Error loading sales ledger:', salesError);
 
@@ -450,11 +450,14 @@ export const CustomersPage: React.FC = () => {
       />
 
       {/* View Customer Ledger Modal */}
-      <CustomerDetailModal
-        isOpen={Boolean(viewingCustomer)}
-        onClose={() => setViewingCustomer(null)}
-        customer={viewingCustomer}
-      />
+    <CustomerDetailModal
+  isOpen={Boolean(viewingCustomer)}
+  onClose={() => {
+    setViewingCustomer(null);
+    fetchData();
+  }}
+  customer={viewingCustomer}
+/>
     </div>
   );
 };
