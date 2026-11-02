@@ -79,6 +79,7 @@ export interface SaleItem {
   product_name: string;
   quantity: number;
   unit_price: number;
+  purchase_price_at_sale: number;
   total: number;
   products?: Product;
 }
