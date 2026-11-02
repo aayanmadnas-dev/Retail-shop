@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS public.products (
     unit TEXT NOT NULL DEFAULT 'pcs',
     item_type TEXT NOT NULL DEFAULT 'inventory' CHECK (item_type IN ('inventory', 'service')),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
 );
 
 CREATE INDEX IF NOT EXISTS idx_products_business_id ON public.products(business_id);
@@ -115,6 +116,7 @@ CREATE TABLE IF NOT EXISTS public.sale_items (
     quantity NUMERIC(12, 2) NOT NULL,
     unit_price NUMERIC(12, 2) NOT NULL,
     total NUMERIC(12, 2) NOT NULL
+    purchase_price_at_sale NUMERIC(12, 2) NOT NULL DEFAULT 0.00,
 );
 
 CREATE INDEX IF NOT EXISTS idx_sale_items_sale_id ON public.sale_items(sale_id);
