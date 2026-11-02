@@ -94,6 +94,7 @@ CREATE TABLE IF NOT EXISTS public.sales (
     discount NUMERIC(12, 2) NOT NULL DEFAULT 0.00,
     tax_amount NUMERIC(12, 2) NOT NULL DEFAULT 0.00,
     total NUMERIC(12, 2) NOT NULL DEFAULT 0.00,
+    paid_amount NUMERIC(12, 2) NOT NULL DEFAULT 0.00,
     payment_method TEXT NOT NULL CHECK (payment_method IN ('cash', 'upi', 'card', 'other')),
     payment_status TEXT NOT NULL CHECK (payment_status IN ('paid', 'partial', 'unpaid')),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
