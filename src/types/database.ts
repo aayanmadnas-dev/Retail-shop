@@ -63,6 +63,7 @@ export interface Sale {
   discount: number;
   tax_amount: number;
   total: number;
+  paid_amount: number;
   payment_method: PaymentMethod;
   payment_status: PaymentStatus;
   created_at: string;
