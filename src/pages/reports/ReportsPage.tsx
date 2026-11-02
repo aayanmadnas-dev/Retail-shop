@@ -167,10 +167,12 @@ const totalGrossProfit = useMemo(() => {
 
   const totalTransactions = filteredSales.length;
 
-  const averageTicketSize = useMemo(() => {
-    return totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
-  }, [totalRevenue, totalTransactions]);
-
+const averageTicketSize = useMemo(() => {
+  return totalTransactions > 0
+    ? totalSales / totalTransactions
+    : 0;
+}, [totalSales, totalTransactions]);
+  
   const totalDiscountsGiven = useMemo(() => {
     return filteredSales.reduce((acc, s) => acc + (Number(s.discount) || 0), 0);
   }, [filteredSales]);
@@ -380,10 +382,10 @@ const totalGrossProfit = useMemo(() => {
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
           <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
-            Total Revenue
+            Total Sales
           </span>
           <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
-            {formatCurrency(totalRevenue)}
+            {formatCurrency(totalSales)}
           </p>
         </div>
 
