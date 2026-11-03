@@ -21,6 +21,8 @@ import {
   Search,
   Filter,
   Eye,
+  Trash2,
+  Undo2,
 } from 'lucide-react';
 import {
   BarChart,
@@ -54,6 +56,8 @@ export const ReportsPage: React.FC = () => {
   // Selected sale for receipt reprint modal
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
   const [selectedCartItems, setSelectedCartItems] = useState<CartItem[]>([]);
+  const [processingSaleId, setProcessingSaleId] = useState<string | null>(null);
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
 
   const fetchReportData = async () => {
     if (!business?.id) return;
@@ -85,13 +89,77 @@ export const ReportsPage: React.FC = () => {
       setIsLoading(false);
     }
   };
+  // Void an invoice and restore stock
+const handleVoidInvoice = async (sale: Sale) => {
+  if (!business?.id || processingSaleId) return;
+
+  const confirmed = window.confirm(
+    `Are you sure you want to void invoice ${sale.invoice_number}?\n\nStock will be restored and this invoice will be excluded from sales reports and customer dues.`
+  );
+
+  if (!confirmed) return;
+
+  setProcessingSaleId(sale.id);
+  setActionMessage(null);
+
+  try {
+    const { error } = await supabase.rpc('void_sale', {
+      p_sale_id: sale.id,
+    });
+
+    if (error) throw error;
+
+    setActionMessage(
+      `Invoice ${sale.invoice_number} voided successfully. Stock restored.`
+    );
+
+    await fetchReportData();
+  } catch (error: any) {
+    setActionMessage(error.message || 'Failed to void invoice.');
+  } finally {
+    setProcessingSaleId(null);
+  }
+};
+
+
+// Undo invoice deletion
+const handleUndoInvoice = async (sale: Sale) => {
+  if (!business?.id || processingSaleId) return;
+
+  const confirmed = window.confirm(
+    `Restore invoice ${sale.invoice_number}?\n\nThe original stock quantities will be deducted again.`
+  );
+
+  if (!confirmed) return;
+
+  setProcessingSaleId(sale.id);
+  setActionMessage(null);
+
+  try {
+    const { error } = await supabase.rpc('undo_void_sale', {
+      p_sale_id: sale.id,
+    });
+
+    if (error) throw error;
+
+    setActionMessage(
+      `Invoice ${sale.invoice_number} restored successfully.`
+    );
+
+    await fetchReportData();
+  } catch (error: any) {
+    setActionMessage(error.message || 'Failed to restore invoice.');
+  } finally {
+    setProcessingSaleId(null);
+  }
+};
 
   useEffect(() => {
     fetchReportData();
   }, [business?.id]);
 
   // Filter sales by date range
-  const filteredSales = useMemo(() => {
+    const matchingSales = useMemo(() => {
     const now = new Date();
 
     return sales.filter((s) => {
@@ -127,6 +195,12 @@ export const ReportsPage: React.FC = () => {
       return true;
     });
   }, [sales, timeRange, startDate, endDate, searchQuery]);
+
+  // Only active invoices contribute to financial calculations.
+const filteredSales = useMemo(
+  () => matchingSales.filter((sale) => !sale.is_voided),
+  [matchingSales]
+);
 
   // Metric Computations
   const totalSales = useMemo(() => {
@@ -522,6 +596,12 @@ const averageTicketSize = useMemo(() => {
           <p className="text-[11px] text-slate-400">
             Click on any invoice to view receipt, print, or share
           </p>
+
+          {actionMessage && (
+  <div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-sm text-slate-700 dark:text-slate-200">
+    {actionMessage}
+  </div>
+)}
         </div>
 
         {isLoading ? (
@@ -534,7 +614,7 @@ const averageTicketSize = useMemo(() => {
           />
         ) : (
           <div className="space-y-2">
-            {filteredSales.map((s) => (
+            {matchingSales.map((s) => (
               <div
                 key={s.id}
                 className="p-3 sm:p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-slate-300 transition-colors"
@@ -559,6 +639,12 @@ const averageTicketSize = useMemo(() => {
                     <Badge variant="slate" size="sm">
                       {s.payment_method.toUpperCase()}
                     </Badge>
+
+                    {s.is_voided && (
+  <Badge variant="rose" size="sm">
+    VOIDED
+  </Badge>
+)}
                   </div>
 
                   <p className="text-xs text-slate-500">
@@ -591,6 +677,31 @@ const averageTicketSize = useMemo(() => {
                     <Eye className="w-3.5 h-3.5" />
                     Receipt
                   </Button>
+
+                  {s.is_voided ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={processingSaleId !== null}
+                    onClick={() => handleUndoInvoice(s)}
+                    className="gap-1.5 text-xs text-emerald-600"
+                  >
+                    <Undo2 className="w-3.5 h-3.5" />
+                    Undo
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={processingSaleId !== null}
+                    onClick={() => handleVoidInvoice(s)}
+                    className="gap-1.5 text-xs text-rose-600"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    Delete
+                  </Button>
+                )}
+                                  
                 </div>
               </div>
             ))}
