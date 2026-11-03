@@ -67,6 +67,11 @@ export interface Sale {
   payment_method: PaymentMethod;
   payment_status: PaymentStatus;
   created_at: string;
+
+  is_voided: boolean;
+voided_at: string | null;
+voided_by: string | null;
+  
   // Joined relation
   customers?: Customer | null;
   sale_items?: SaleItem[];
