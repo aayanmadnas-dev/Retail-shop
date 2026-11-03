@@ -59,8 +59,8 @@ export const CustomersPage: React.FC = () => {
       const { data: salesData, error: salesError } = await supabase
   .from('sales')
   .select('customer_id, total, payment_status, paid_amount')
-  .eq('business_id', business.id);
-
+  .eq('business_id', business.id)
+  .eq('is_voided', false);
       if (salesError) console.error('Error loading sales ledger:', salesError);
 
       const custs = (customerData as Customer[]) || [];
