@@ -606,7 +606,7 @@ const averageTicketSize = useMemo(() => {
 
         {isLoading ? (
           <TableSkeleton rows={5} />
-        ) : filteredSales.length === 0 ? (
+        ) : matchingSales.length === 0 ? (
           <EmptyState
             icon={<Receipt className="w-8 h-8" />}
             title="No Invoices Found"
