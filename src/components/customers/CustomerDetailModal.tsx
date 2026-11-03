@@ -40,6 +40,7 @@ export const CustomerDetailModal: React.FC<CustomerDetailModalProps> = ({
         .select('*')
         .eq('business_id', business.id)
         .eq('customer_id', customer.id)
+        .eq('is_voided', false)
         .order('created_at', { ascending: false })
         .then(({ data, error }) => {
           if (!error && data) {
