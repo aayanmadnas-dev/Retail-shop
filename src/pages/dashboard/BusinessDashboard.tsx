@@ -56,7 +56,8 @@ export const BusinessDashboard: React.FC = () => {
     .from('sales')
     .select('*, customers(name)')
     .eq('business_id', business.id)
-    .order('created_at', { ascending: false }),
+    .eq('is_voided', false)      
+    .order('created_at', { ascending: false }),      
 
   supabase
     .from('sale_items')
