@@ -22,6 +22,7 @@ export const BusinessProfile: React.FC = () => {
   const [ownerName, setOwnerName] = useState('');
   const [address, setAddress] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [isEmailUpdating, setIsEmailUpdating] = useState(false);
   const [message, setMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -84,7 +85,49 @@ export const BusinessProfile: React.FC = () => {
     setIsSaving(false);
   }
 };
+    const handleEmailChange = async () => {
+  if (!user || !profile || profile.role !== 'business_owner') {
+    setErrorMessage('Only the business owner can change the login email.');
+    return;
+  }
 
+  const newEmail = email.trim().toLowerCase();
+
+  if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+    setErrorMessage('Please enter a valid email address.');
+    return;
+  }
+
+  if (newEmail === user.email?.toLowerCase()) {
+    setErrorMessage('This is already your current login email.');
+    return;
+  }
+
+  setIsEmailUpdating(true);
+  setMessage('');
+  setErrorMessage('');
+
+  try {
+    const { error } = await supabase.auth.updateUser(
+      { email: newEmail },
+      {
+        emailRedirectTo: `${window.location.origin}/business-profile`,
+      }
+    );
+
+    if (error) throw error;
+
+    setMessage(
+      'Verification email requested. Please check your email inbox and complete the verification process.'
+    );
+  } catch (error: any) {
+    console.error('Email change request failed:', error);
+    setErrorMessage(error.message || 'Could not request email change.');
+  } finally {
+    setIsEmailUpdating(false);
+  }
+};
+  
   return (
     <div className="max-w-3xl mx-auto space-y-6">
 
@@ -130,16 +173,28 @@ export const BusinessProfile: React.FC = () => {
           required
         />
 
-        <Input
-          readOnly
-          label="Business Email / Login Email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          leftIcon={<Mail className="w-4 h-4" />}
-          helperText="Email changes will be enabled with verification in the next step."
-          required
-        />
+       <div className="space-y-3">
+  <Input
+    label="Business Email / Login Email"
+    type="email"
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    leftIcon={<Mail className="w-4 h-4" />}
+    helperText="Changing this email requires verification."
+    required
+  />
+
+  <Button
+    type="button"
+    variant="outline"
+    className="w-full sm:w-auto"
+    onClick={handleEmailChange}
+    isLoading={isEmailUpdating}
+    disabled={isEmailUpdating}
+  >
+    {isEmailUpdating ? 'Sending...' : 'Verify New Email'}
+  </Button>
+</div>
 
         <Input
           label="Phone Number"
