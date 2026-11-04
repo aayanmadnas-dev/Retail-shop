@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
-import { Store, Eye, EyeOff, Lock, Mail, AlertCircle, ShieldAlert } from 'lucide-react';
+import { Store, Eye, EyeOff, Lock, Mail, AlertCircle } from 'lucide-react';
 
 export const BusinessLogin: React.FC = () => {
   const navigate = useNavigate();
@@ -141,19 +141,3 @@ export const BusinessLogin: React.FC = () => {
             </p>
           </div>
         </div>
-
-        {/* Footer link to admin login */}
-        <div className="text-center mt-6">
-          <Link
-            to="/admin/login"
-            className="text-xs text-slate-500 hover:text-purple-600 dark:hover:text-purple-400 font-medium inline-flex items-center gap-1.5 transition-colors"
-          >
-            <ShieldAlert className="w-3.5 h-3.5" />
-            Super Admin Portal Login
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-};
-
