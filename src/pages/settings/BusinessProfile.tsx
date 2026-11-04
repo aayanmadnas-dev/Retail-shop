@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
+import { supabase } from '../../lib/supabase';
 import {
   Store,
   Mail,
@@ -13,13 +14,16 @@ import {
 } from 'lucide-react';
 
 export const BusinessProfile: React.FC = () => {
-  const { user, profile, business } = useAuth();
+  const { user, profile, business, refreshProfile } = useAuth();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [ownerName, setOwnerName] = useState('');
   const [address, setAddress] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     setName(business?.name || '');
@@ -29,20 +33,57 @@ export const BusinessProfile: React.FC = () => {
     setAddress(business?.address || '');
   }, [business, profile, user]);
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
+ const handleSave = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    // Database saving will be connected in the next implementation step.
-    alert('Profile form is ready. Database saving will be enabled in the next step.');
-  };
-
-  if (!business || !profile) {
-    return (
-      <div className="p-6 text-sm text-slate-500">
-        Business profile is not available.
-      </div>
-    );
+  if (!user || !profile || !business) {
+    setErrorMessage('Your business profile could not be verified.');
+    return;
   }
+
+  if (profile.role !== 'business_owner') {
+    setErrorMessage('Only the business owner can update this profile.');
+    return;
+  }
+
+  setIsSaving(true);
+  setMessage('');
+  setErrorMessage('');
+
+  try {
+    // Update business information
+    const { error: businessError } = await supabase
+      .from('businesses')
+      .update({
+        name: name.trim(),
+        phone: phone.trim() || null,
+        address: address.trim() || null,
+      })
+      .eq('id', business.id);
+
+    if (businessError) throw businessError;
+
+    // Update business owner's name
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .update({
+        full_name: ownerName.trim(),
+      })
+      .eq('user_id', user.id);
+
+    if (profileError) throw profileError;
+
+    setMessage('Business profile updated successfully.');
+
+    // Refresh the profile and business information in the app
+    await refreshProfile();
+  } catch (error: any) {
+    console.error('Business profile update failed:', error);
+    setErrorMessage(error.message || 'Failed to update business profile.');
+  } finally {
+    setIsSaving(false);
+  }
+};
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -90,12 +131,13 @@ export const BusinessProfile: React.FC = () => {
         />
 
         <Input
+          readOnly
           label="Business Email / Login Email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           leftIcon={<Mail className="w-4 h-4" />}
-          helperText="Changing your login email will require verification."
+          helperText="Email changes will be enabled with verification in the next step."
           required
         />
 
@@ -145,10 +187,27 @@ export const BusinessProfile: React.FC = () => {
           </span>
         </div>
 
+        {message && (
+  <p className="text-sm text-emerald-600 font-medium">
+    {message}
+  </p>
+)}
+
+{errorMessage && (
+  <p className="text-sm text-rose-500 font-medium">
+    {errorMessage}
+  </p>
+)}
+
         <div className="flex justify-end pt-2">
-          <Button type="submit" className="w-full sm:w-auto">
-            Save Changes
-          </Button>
+         <Button
+  type="submit"
+  className="w-full sm:w-auto"
+  isLoading={isSaving}
+  disabled={isSaving}
+>
+  {isSaving ? 'Saving...' : 'Save Changes'}
+</Button>
         </div>
 
       </form>
