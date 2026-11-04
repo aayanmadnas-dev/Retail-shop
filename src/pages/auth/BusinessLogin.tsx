@@ -141,3 +141,7 @@ export const BusinessLogin: React.FC = () => {
             </p>
           </div>
         </div>
+      </div>
+    </div>
+  );
+};
