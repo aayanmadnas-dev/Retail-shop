@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { LayoutDashboard, Receipt, Package, Users, BarChart3, Store, ChevronRight } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useAuth } from '../../context/AuthContext';
@@ -18,19 +18,31 @@ export const Sidebar: React.FC = () => {
   return (
     <aside className="hidden sm:flex flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 p-4 shrink-0 h-[calc(100vh-61px)] sticky top-[61px]">
       {/* Store quick info card */}
-      <div className="p-3.5 mb-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
-          <Store className="w-5 h-5" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
-            {business?.name || 'Retail Shop'}
-          </p>
-          <p className="text-[11px] text-slate-500 truncate">
-            {business?.phone || 'Retail Business'}
-          </p>
-        </div>
-      </div>
+      {/* Clickable Store Profile Card */}
+<Link
+  to="/business-profile"
+  className="p-3.5 mb-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center gap-3 hover:border-emerald-400 hover:bg-emerald-50/60 dark:hover:bg-emerald-950/20 transition-all group"
+>
+  <div className="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
+    <Store className="w-5 h-5" />
+  </div>
+
+  <div className="min-w-0 flex-1">
+    <p className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+      {business?.name || 'Retail Shop'}
+    </p>
+
+    <p className="text-[11px] text-slate-500 truncate">
+      {business?.phone || 'Retail Business'}
+    </p>
+
+    <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 font-semibold">
+      Manage Business Profile
+    </p>
+  </div>
+
+  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 transition-colors" />
+</Link>
 
       {/* Navigation links */}
       <nav className="space-y-1.5 flex-1">
