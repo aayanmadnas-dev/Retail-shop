@@ -16,6 +16,7 @@ import { BillingPage } from './pages/billing/BillingPage';
 import { InventoryPage } from './pages/inventory/InventoryPage';
 import { CustomersPage } from './pages/customers/CustomersPage';
 import { ReportsPage } from './pages/reports/ReportsPage';
+import { BusinessProfile } from './pages/settings/BusinessProfile';
 
 // Super Admin Pages
 import { AdminDashboard } from './pages/admin/AdminDashboard';
@@ -47,6 +48,7 @@ export const App: React.FC = () => {
             <Route path="inventory" element={<InventoryPage />} />
             <Route path="customers" element={<CustomersPage />} />
             <Route path="reports" element={<ReportsPage />} />
+            <Route path="business-profile" element={<BusinessProfile />} />
           </Route>
 
           {/* 404 Fallback */}
