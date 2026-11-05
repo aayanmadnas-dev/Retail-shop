@@ -76,7 +76,7 @@ export const BusinessProfile: React.FC = () => {
 
     setMessage('Business profile updated successfully.');
 
-    // Refresh the profile and business information in the app
+    // Refresh the profile and business information
     await refreshProfile();
   } catch (error: any) {
     console.error('Business profile update failed:', error);
