@@ -1,6 +1,6 @@
 -- ==============================================================================
 -- RetailFlow: Multi-Business Retail Billing & Inventory SaaS Database Schema
--- Supabase PostgreSQL Reference Architecture
+-- Supabase PostgreSQL Reference Architecture with Rls security
 -- ==============================================================================
 
 -- Enable UUID extension if not already enabled
