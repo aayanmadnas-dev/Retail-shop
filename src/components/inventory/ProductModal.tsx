@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { Html5Qrcode } from 'html5-qrcode';
 import { Modal } from '../ui/Modal';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import type { Product, ItemType } from '../../types/database';
-import { AlertCircle, Barcode, Tag, Package, Wrench, Layers } from 'lucide-react';
+import { AlertCircle, Barcode, Tag, Package, Wrench, Layers, Camera } from 'lucide-react';
 
 interface ProductModalProps {
   isOpen: boolean;
@@ -37,6 +38,8 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [cameraStatus, setCameraStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (product) {
@@ -64,6 +67,73 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       setError(null);
     }
   }, [product, isOpen]);
+
+  useEffect(() => {
+  if (!isOpen || !isCameraOpen) return;
+
+  let cancelled = false;
+  let scanner: Html5Qrcode | null = null;
+
+  const startCamera = async () => {
+    try {
+      scanner = new Html5Qrcode('inventory-barcode-reader');
+
+      await scanner.start(
+        { facingMode: 'environment' },
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 130 },
+        },
+        (decodedText) => {
+          if (cancelled) return;
+
+          setBarcode(decodedText);
+          setCameraStatus('Barcode captured successfully!');
+          setIsCameraOpen(false);
+        },
+        () => {
+          // Ignore frames where no barcode is detected.
+        }
+      );
+
+      if (cancelled && scanner.isScanning) {
+        await scanner.stop();
+      }
+    } catch (err) {
+      console.error('Inventory camera error:', err);
+
+      if (!cancelled) {
+        setCameraStatus(
+          'Camera unavailable. Please allow camera permission or enter the barcode manually.'
+        );
+      }
+    }
+  };
+
+  const timer = window.setTimeout(() => {
+    void startCamera();
+  }, 200);
+
+  return () => {
+    cancelled = true;
+    window.clearTimeout(timer);
+
+    if (scanner) {
+      if (scanner.isScanning) {
+        void scanner
+          .stop()
+          .then(() => scanner?.clear())
+          .catch((err) => console.warn('Camera cleanup:', err));
+      } else {
+        try {
+          scanner.clear();
+        } catch {
+          // Scanner may already be cleared.
+        }
+      }
+    }
+  };
+}, [isOpen, isCameraOpen]);
 
   const handleItemTypeChange = (type: ItemType) => {
     setItemType(type);
@@ -335,13 +405,52 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                 onChange={(e) => setSku(e.target.value)}
                 leftIcon={<Tag className="w-3.5 h-3.5" />}
               />
-              <Input
-                label="Barcode / EAN (Optional)"
-                placeholder="e.g. 8901234567890"
-                value={barcode}
-                onChange={(e) => setBarcode(e.target.value)}
-                leftIcon={<Barcode className="w-3.5 h-3.5" />}
-              />
+              <div className="space-y-2">
+  <Input
+    label="Barcode / EAN (Optional)"
+    placeholder="e.g. 8901234567890"
+    value={barcode}
+    onChange={(e) => setBarcode(e.target.value)}
+    leftIcon={<Barcode className="w-3.5 h-3.5" />}
+  />
+
+  <Button
+    type="button"
+    variant="outline"
+    className="w-full gap-2"
+    onClick={() => {
+      setCameraStatus(null);
+      setIsCameraOpen(true);
+    }}
+  >
+    <Camera className="w-4 h-4" />
+    Scan Using Camera
+  </Button>
+
+  {isCameraOpen && (
+    <div className="space-y-2">
+      <div
+        id="inventory-barcode-reader"
+        className="w-full overflow-hidden rounded-xl bg-black"
+      />
+
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full"
+        onClick={() => setIsCameraOpen(false)}
+      >
+        Close Camera
+      </Button>
+    </div>
+  )}
+
+  {cameraStatus && (
+    <p className="text-xs text-emerald-600">
+      {cameraStatus}
+    </p>
+  )}
+</div>
             </div>
           </div>
         )}
