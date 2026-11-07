@@ -6,7 +6,7 @@ import { cn } from '../../lib/utils';
 export const BottomNav: React.FC = () => {
   const navItems = [
   { to: '/dashboard', label: 'Home', icon: LayoutDashboard },
-  { to: '/billing', label: 'Billing', icon: Receipt, highlight: true },
+  { to: '/billing', label: 'Billing', icon: Receipt },
   { to: '/inventory', label: 'Stock', icon: Package },
   { to: '/customers', label: 'Customers', icon: Users },
   { to: '/reports', label: 'Reports', icon: BarChart3 },
@@ -28,14 +28,14 @@ export const BottomNav: React.FC = () => {
                   isActive
                     ? 'text-emerald-600 dark:text-emerald-400 font-semibold scale-105'
                     : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200',
-                  item.highlight && !isActive && 'text-emerald-600/80 font-medium'
-                )
               }
             >
               <div className={cn(
-                'p-1 rounded-lg transition-colors',
-                item.highlight && 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600'
-              )}>
+  'p-1 rounded-lg transition-colors',
+  isActive
+    ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400'
+    : 'text-slate-500 dark:text-slate-400'
+)}>
                 <Icon className="w-5 h-5" />
               </div>
               <span className="text-[10px] mt-0.5 tracking-tight">{item.label}</span>
