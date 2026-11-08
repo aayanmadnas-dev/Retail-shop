@@ -233,32 +233,6 @@ export const InventoryPage: React.FC = () => {
     Add Product
   </Button>
 </div>
-
-            <Button
-              variant="outline"
-              size="md"
-              onClick={() => setIsImportModalOpen(true)}
-              className="gap-2"
->
-  <Upload className="w-4 h-4" />
-  <span>Import CSV</span>
-</Button>
-            <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Export CSV</span>
-          </Button>
-          <Button
-            variant="primary"
-            size="md"
-            onClick={() => {
-              setEditingProduct(null);
-              setIsProductModalOpen(true);
-            }}
-            className="gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Add Product
-          </Button>
-        </div>
       </div>
 
       {/* Inventory Valuation Bar */}
