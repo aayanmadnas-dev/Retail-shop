@@ -25,6 +25,7 @@ import {
   History,
   AlertTriangle,
   Download,
+  Upload,
   Boxes,
   TrendingUp,
 } from 'lucide-react';
@@ -37,6 +38,7 @@ export const InventoryPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [lowStockOnly, setLowStockOnly] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   // Modals state
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
