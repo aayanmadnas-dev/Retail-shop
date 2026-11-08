@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Upload, FileSpreadsheet, Download, X } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 
 
 const parseCSV = (text: string): string[][] => {
@@ -67,7 +68,73 @@ export const CSVImportModal: React.FC<CSVImportModalProps> = ({
   const [file, setFile] = useState<File | null>(null);
   const [parsedRows, setParsedRows] = useState<string[][]>([]);
   const [parseError, setParseError] = useState('');
+  const [isImporting, setIsImporting] = useState(false);
+const [importError, setImportError] = useState('');
+const [importSuccess, setImportSuccess] = useState('');
 
+  const handleImport = async () => {
+  if (parsedRows.length < 2 || isImporting) return;
+
+  setIsImporting(true);
+  setImportError('');
+  setImportSuccess('');
+
+  try {
+    const csvHeaders = (parsedRows[0] || []).map(header =>
+      header.trim().toLowerCase().replace(/^\uFEFF/, '')
+    );
+
+    const getValue = (row: string[], field: string) => {
+      const index = csvHeaders.indexOf(field);
+      return index === -1 ? '' : (row[index] || '').trim();
+    };
+
+    const products = parsedRows.slice(1).map(row => {
+      const itemType = getValue(row, 'item_type').toLowerCase() || 'inventory';
+      const isService = itemType === 'service';
+
+      return {
+        name: getValue(row, 'name'),
+        category: getValue(row, 'category') || (isService ? 'Service' : null),
+        sku: isService ? null : (getValue(row, 'sku') || null),
+        barcode: isService ? null : (getValue(row, 'barcode') || null),
+        purchase_price: Number(getValue(row, 'purchase_price') || 0),
+        selling_price: Number(getValue(row, 'selling_price') || 0),
+        stock_quantity: isService
+          ? 0
+          : Number(getValue(row, 'stock_quantity') || 0),
+        unit: getValue(row, 'unit') || (isService ? 'service' : 'pcs'),
+        item_type: itemType,
+      };
+    });
+
+    const { data, error } = await supabase.rpc(
+      'import_products_bulk',
+      { p_products: products }
+    );
+
+    if (error) throw error;
+
+    setImportSuccess(
+      `Successfully imported ${data.imported_count} products.`
+    );
+
+    setFile(null);
+    setParsedRows([]);
+    onSuccess();
+
+  } catch (error) {
+    console.error('CSV import error:', error);
+
+    setImportError(
+      error instanceof Error
+        ? error.message
+        : 'Import failed. Please try again.'
+    );
+  } finally {
+    setIsImporting(false);
+  }
+};
   
 const headers = (parsedRows[0] || []).map(header =>
   header.trim().toLowerCase().replace(/^\uFEFF/, '')
