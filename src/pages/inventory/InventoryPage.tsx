@@ -542,6 +542,18 @@ export const InventoryPage: React.FC = () => {
         product={historyProduct}
       />
 
+      {/* Inventory Barcode Scanner */}
+<BarcodeScannerModal
+  isOpen={isScannerOpen}
+  onClose={() => setIsScannerOpen(false)}
+  products={products}
+  onProductScanned={(product) => {
+    setSearchQuery(product.barcode || product.sku || product.name);
+    setSelectedCategory('all');
+    setLowStockOnly(false);
+  }}
+/>
+
       {/* Soft Delete Confirmation Dialog */}
       {deletingProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
