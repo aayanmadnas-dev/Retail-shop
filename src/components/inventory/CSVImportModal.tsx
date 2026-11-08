@@ -4,6 +4,55 @@ import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Upload, FileSpreadsheet, Download, X } from 'lucide-react';
 
+
+const parseCSV = (text: string): string[][] => {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = '';
+  let insideQuotes = false;
+
+  text = text.replace(/^\uFEFF/, '');
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (char === '"') {
+      if (insideQuotes && next === '"') {
+        cell += '"';
+        i++;
+      } else {
+        insideQuotes = !insideQuotes;
+      }
+    } else if (char === ',' && !insideQuotes) {
+      row.push(cell.trim());
+      cell = '';
+    } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+      if (char === '\r' && next === '\n') i++;
+
+      row.push(cell.trim());
+      if (row.some(value => value !== '')) rows.push(row);
+
+      row = [];
+      cell = '';
+    } else {
+      cell += char;
+    }
+  }
+
+  if (insideQuotes) {
+    throw new Error('Invalid CSV: A quoted field was not closed.');
+  }
+
+  if (cell.length > 0 || row.length > 0) {
+    row.push(cell.trim());
+    if (row.some(value => value !== '')) rows.push(row);
+  }
+
+  return rows;
+};
+
+
 interface CSVImportModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -16,6 +65,8 @@ export const CSVImportModal: React.FC<CSVImportModalProps> = ({
   onSuccess,
 }) => {
   const [file, setFile] = useState<File | null>(null);
+  const [parsedRows, setParsedRows] = useState<string[][]>([]);
+  const [parseError, setParseError] = useState('');
 
   const downloadTemplate = () => {
     const headers = [
@@ -114,11 +165,40 @@ export const CSVImportModal: React.FC<CSVImportModalProps> = ({
               type="file"
               accept=".csv,text/csv"
               className="hidden"
-              onChange={event => {
-                const selected = event.target.files?.[0] || null;
-                setFile(selected);
-                event.target.value = '';
-              }}
+              onChange={async event => {
+  const selected = event.target.files?.[0] || null;
+  event.target.value = '';
+
+  setFile(selected);
+  setParsedRows([]);
+  setParseError('');
+
+  if (!selected) return;
+
+  try {
+    if (!selected.name.toLowerCase().endsWith('.csv')) {
+      throw new Error('Please select a CSV file.');
+    }
+
+    if (selected.size > 5 * 1024 * 1024) {
+      throw new Error('File size must be less than 5 MB.');
+    }
+
+    const text = await selected.text();
+    const rows = parseCSV(text);
+
+    if (rows.length < 2) {
+      throw new Error('CSV must contain a header and at least one product.');
+    }
+
+    setParsedRows(rows);
+  } catch (error) {
+    setFile(null);
+    setParseError(
+      error instanceof Error ? error.message : 'Failed to read CSV file.'
+    );
+  }
+}}
             />
           </label>
         </div>
