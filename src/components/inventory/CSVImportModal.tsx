@@ -462,3 +462,7 @@ const rowValidationErrors: string[] = parsedRows.slice(1).flatMap(
     {isImporting ? 'Importing...' : 'Import Products'}
   </Button>
 </div>
+      </div>
+    </Modal>
+  );
+};
