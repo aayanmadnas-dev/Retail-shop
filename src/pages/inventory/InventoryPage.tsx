@@ -6,6 +6,7 @@ import { ProductModal } from '../../components/inventory/ProductModal';
 import { StockAdjustModal } from '../../components/inventory/StockAdjustModal';
 import { StockMovementHistoryModal } from '../../components/inventory/StockMovementHistoryModal';
 import { BarcodeScannerModal } from '../../components/billing/BarcodeScannerModal';
+import { CSVImportModal } from '../../components/inventory/CSVImportModal';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
@@ -565,6 +566,13 @@ export const InventoryPage: React.FC = () => {
     setSelectedCategory('all');
     setLowStockOnly(false);
   }}
+/>
+
+        {/* CSV Product Import Modal */}
+<CSVImportModal
+  isOpen={isImportModalOpen}
+  onClose={() => setIsImportModalOpen(false)}
+  onSuccess={fetchProducts}
 />
 
       {/* Soft Delete Confirmation Dialog */}
