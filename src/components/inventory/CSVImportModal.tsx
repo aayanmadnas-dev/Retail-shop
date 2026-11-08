@@ -84,7 +84,57 @@ const headerError = missingHeaders.length > 0
   : '';
 
 const previewRows = parsedRows.slice(1, 6);
+const rowValidationErrors: string[] = parsedRows.slice(1).flatMap(
+  (row, index) => {
+    const errors: string[] = [];
+    const rowNumber = index + 2;
 
+    const nameIndex = headers.indexOf('name');
+    if (nameIndex !== -1 && !row[nameIndex]?.trim()) {
+      errors.push(`Row ${rowNumber}: Product name is required.`);
+    }
+
+    if (row.length > headers.length) {
+      errors.push(`Row ${rowNumber}: More values than CSV headers.`);
+    }
+
+    const numericFields = [
+      'purchase_price',
+      'selling_price',
+      'stock_quantity',
+    ];
+
+    numericFields.forEach(field => {
+      const columnIndex = headers.indexOf(field);
+      if (columnIndex === -1) return;
+
+      const value = row[columnIndex]?.trim();
+      if (value === undefined || value === '') return;
+
+      const number = Number(value);
+
+      if (!Number.isFinite(number) || number < 0) {
+        errors.push(
+          `Row ${rowNumber}: ${field} must be a valid non-negative number.`
+        );
+      }
+    });
+
+    const itemTypeIndex = headers.indexOf('item_type');
+
+    if (itemTypeIndex !== -1) {
+      const itemType = row[itemTypeIndex]?.trim().toLowerCase();
+
+      if (itemType && !['inventory', 'service'].includes(itemType)) {
+        errors.push(
+          `Row ${rowNumber}: item_type must be inventory or service.`
+        );
+      }
+    }
+
+    return errors;
+  }
+);
 
   const downloadTemplate = () => {
     const headers = [
@@ -240,6 +290,26 @@ const previewRows = parsedRows.slice(1, 6);
       </p>
     )}
 
+    {rowValidationErrors.length > 0 && (
+  <div className="rounded-lg bg-red-50 dark:bg-red-950/30 p-3 space-y-1">
+    <p className="text-sm font-semibold text-red-700 dark:text-red-400">
+      Please correct these CSV errors:
+    </p>
+
+    {rowValidationErrors.slice(0, 10).map((error, index) => (
+      <p key={index} className="text-xs text-red-600 dark:text-red-300">
+        {error}
+      </p>
+    ))}
+
+    {rowValidationErrors.length > 10 && (
+      <p className="text-xs text-red-600">
+        And {rowValidationErrors.length - 10} more errors.
+      </p>
+    )}
+  </div>
+)}
+
     <div className="overflow-x-auto border rounded-lg">
       <table className="w-full text-xs text-left">
         <thead className="bg-slate-100 dark:bg-slate-800">
@@ -294,8 +364,14 @@ const previewRows = parsedRows.slice(1, 6);
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={handleClose}>
             Cancel
-          </Button>
-       <Button disabled={!file || parsedRows.length < 2 || !!headerError}>
+        <Button
+  disabled={
+    !file ||
+    parsedRows.length < 2 ||
+    !!headerError ||
+    rowValidationErrors.length > 0
+  }
+>
   Continue
 </Button>
         </div>
