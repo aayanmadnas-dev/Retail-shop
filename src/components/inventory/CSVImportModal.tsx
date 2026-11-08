@@ -427,20 +427,38 @@ const rowValidationErrors: string[] = parsedRows.slice(1).flatMap(
             </button>
           </div>
         )}
+        {importError && (
+  <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 p-3 rounded-lg">
+    {importError}
+  </p>
+)}
 
-       <div className="flex justify-end gap-2">
-  <Button variant="outline" onClick={handleClose}>
+{importSuccess && (
+  <p className="text-sm text-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 p-3 rounded-lg">
+    {importSuccess}
+  </p>
+)}
+
+      <div className="flex justify-end gap-2">
+  <Button
+    variant="outline"
+    onClick={handleClose}
+    disabled={isImporting}
+  >
     Cancel
   </Button>
 
   <Button
+    onClick={handleImport}
     disabled={
       !file ||
       parsedRows.length < 2 ||
       !!headerError ||
-      rowValidationErrors.length > 0
+      rowValidationErrors.length > 0 ||
+      isImporting
     }
+    isLoading={isImporting}
   >
-    Continue
+    {isImporting ? 'Importing...' : 'Import Products'}
   </Button>
 </div>
