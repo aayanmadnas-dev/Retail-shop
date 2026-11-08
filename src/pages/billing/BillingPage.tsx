@@ -404,15 +404,15 @@ const saleItemsToInsert = cart.map((item) => ({
         </div>
 
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsScannerOpen(true)}
-            className="gap-1.5 text-xs font-semibold"
-          >
-            <Barcode className="w-4 h-4 text-emerald-600" />
-            <span className="hidden sm:inline">Scan Barcode</span>
-          </Button>
+         <Button
+  variant="outline"
+  size="sm"
+  onClick={() => setIsScannerOpen(true)}
+  className="gap-1.5 text-xs font-semibold"
+>
+  <Barcode className="w-4 h-4 text-emerald-600" />
+  <span>Scan barcode</span>
+</Button>
           {cart.length > 0 && (
             <Button
               variant="ghost"
