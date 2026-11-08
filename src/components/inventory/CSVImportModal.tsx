@@ -361,21 +361,19 @@ const rowValidationErrors: string[] = parsedRows.slice(1).flatMap(
           </div>
         )}
 
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={handleClose}>
-            Cancel
-        <Button
-  disabled={
-    !file ||
-    parsedRows.length < 2 ||
-    !!headerError ||
-    rowValidationErrors.length > 0
-  }
->
-  Continue
-</Button>
-        </div>
-      </div>
-    </Modal>
-  );
-};
+       <div className="flex justify-end gap-2">
+  <Button variant="outline" onClick={handleClose}>
+    Cancel
+  </Button>
+
+  <Button
+    disabled={
+      !file ||
+      parsedRows.length < 2 ||
+      !!headerError ||
+      rowValidationErrors.length > 0
+    }
+  >
+    Continue
+  </Button>
+</div>
