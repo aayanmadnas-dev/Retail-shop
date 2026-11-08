@@ -198,14 +198,41 @@ export const InventoryPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="md"
-            onClick={handleExportCSV}
-            disabled={filteredProducts.length === 0}
-            className="gap-2"
-          >
+       <div className="flex items-center gap-2">
+  <Button
+    variant="outline"
+    size="md"
+    onClick={handleExportCSV}
+    disabled={filteredProducts.length === 0}
+    className="gap-2"
+  >
+    <Download className="w-4 h-4" />
+    <span className="hidden sm:inline">Export CSV</span>
+  </Button>
+
+  <Button
+    variant="outline"
+    size="md"
+    onClick={() => setIsImportModalOpen(true)}
+    className="gap-2"
+  >
+    <Upload className="w-4 h-4" />
+    <span>Import CSV</span>
+  </Button>
+
+  <Button
+    variant="primary"
+    size="md"
+    onClick={() => {
+      setEditingProduct(null);
+      setIsProductModalOpen(true);
+    }}
+    className="gap-2"
+  >
+    <Plus className="w-4 h-4" />
+    Add Product
+  </Button>
+</div>
 
             <Button
               variant="outline"
