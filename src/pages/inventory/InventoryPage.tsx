@@ -204,6 +204,16 @@ export const InventoryPage: React.FC = () => {
             disabled={filteredProducts.length === 0}
             className="gap-2"
           >
+
+            <Button
+              variant="outline"
+              size="md"
+              onClick={() => setIsImportModalOpen(true)}
+              className="gap-2"
+>
+  <Upload className="w-4 h-4" />
+  <span>Import CSV</span>
+</Button>
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">Export CSV</span>
           </Button>
