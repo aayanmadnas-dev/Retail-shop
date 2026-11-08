@@ -68,6 +68,24 @@ export const CSVImportModal: React.FC<CSVImportModalProps> = ({
   const [parsedRows, setParsedRows] = useState<string[][]>([]);
   const [parseError, setParseError] = useState('');
 
+  
+const headers = (parsedRows[0] || []).map(header =>
+  header.trim().toLowerCase().replace(/^\uFEFF/, '')
+);
+
+const requiredHeaders = ['name'];
+
+const missingHeaders = requiredHeaders.filter(
+  header => !headers.includes(header)
+);
+
+const headerError = missingHeaders.length > 0
+  ? `Missing required column: ${missingHeaders.join(', ')}`
+  : '';
+
+const previewRows = parsedRows.slice(1, 6);
+
+
   const downloadTemplate = () => {
     const headers = [
       'name',
@@ -203,6 +221,57 @@ export const CSVImportModal: React.FC<CSVImportModalProps> = ({
           </label>
         </div>
 
+        
+{parseError && (
+  <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 p-3 rounded-lg">
+    {parseError}
+  </p>
+)}
+
+{parsedRows.length > 0 && (
+  <div className="space-y-3">
+    {headerError ? (
+      <p className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+        {headerError}
+      </p>
+    ) : (
+      <p className="text-sm text-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 p-3 rounded-lg">
+        CSV headers validated successfully. {parsedRows.length - 1} product rows found.
+      </p>
+    )}
+
+    <div className="overflow-x-auto border rounded-lg">
+      <table className="w-full text-xs text-left">
+        <thead className="bg-slate-100 dark:bg-slate-800">
+          <tr>
+            {headers.map(header => (
+              <th key={header} className="p-2 whitespace-nowrap">
+                {header}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {previewRows.map((row, index) => (
+            <tr key={index} className="border-t dark:border-slate-700">
+              {headers.map((header, columnIndex) => (
+                <td key={columnIndex} className="p-2 whitespace-nowrap">
+                  {row[columnIndex] || '-'}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <p className="text-xs text-slate-500">
+      Showing up to 5 products as a preview.
+    </p>
+  </div>
+)}
+
+
         {file && (
           <div className="flex items-center justify-between rounded-lg bg-slate-100 dark:bg-slate-800 p-3">
             <div className="min-w-0">
@@ -226,9 +295,9 @@ export const CSVImportModal: React.FC<CSVImportModalProps> = ({
           <Button variant="outline" onClick={handleClose}>
             Cancel
           </Button>
-          <Button disabled={!file}>
-            Continue
-          </Button>
+       <Button disabled={!file || parsedRows.length < 2 || !!headerError}>
+  Continue
+</Button>
         </div>
       </div>
     </Modal>
