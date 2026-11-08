@@ -245,11 +245,23 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 
       onSuccess();
       onClose();
-    } catch (err: any) {
-      setError(err.message || 'Failed to save item.');
-    } finally {
-      setIsLoading(false);
-    }
+   } catch (err: any) {
+  if (
+    err.code === '23505' &&
+    err.message?.includes('products_business_id_barcode_active_key')
+  ) {
+    setError('This barcode is already assigned to another active product in your business.');
+  } else if (
+    err.code === '23505' &&
+    err.message?.includes('products_business_id_sku_key')
+  ) {
+    setError('This SKU is already assigned to another product in your business.');
+  } else {
+    setError(err.message || 'Failed to save item.');
+  }
+} finally {
+  setIsLoading(false);
+}
   };
 
   return (
