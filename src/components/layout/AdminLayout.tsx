@@ -1,18 +1,15 @@
 import React from 'react';
 import { Outlet, Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { ShieldCheck, LogOut, Sun, Moon, Building2, Store } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 
 export const AdminLayout: React.FC = () => {
   const { user, profile, isSuperAdmin, isLoading, signOut } = useAuth();
-  const [isDark, setIsDark] = React.useState(false);
-
-  const toggleDarkMode = () => {
-    setIsDark(!isDark);
-    document.documentElement.classList.toggle('dark');
-  };
+ 
+  const { theme, toggleTheme } = useTheme();
 
   if (isLoading) {
     return (
@@ -56,11 +53,16 @@ export const AdminLayout: React.FC = () => {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            >
-              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
+  onClick={toggleTheme}
+  className="p-2 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+  title="Toggle theme"
+>
+  {theme === 'dark' ? (
+    <Sun className="w-4 h-4" />
+  ) : (
+    <Moon className="w-4 h-4" />
+  )}
+</button>
 
             <Button
               variant="ghost"
