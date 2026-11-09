@@ -1,17 +1,14 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { LogOut, Store, ShieldCheck, Sun, Moon, AlertTriangle } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 
 export const Navbar: React.FC = () => {
   const { profile, business, isSuperAdmin, isSuspended, signOut } = useAuth();
-  const [isDark, setIsDark] = React.useState(false);
 
-  const toggleDarkMode = () => {
-    setIsDark(!isDark);
-    document.documentElement.classList.toggle('dark');
-  };
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <header className="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 sm:px-6 py-3 transition-colors">
@@ -51,12 +48,16 @@ export const Navbar: React.FC = () => {
         {/* Right: Actions */}
         <div className="flex items-center gap-2">
           <button
-            onClick={toggleDarkMode}
-            className="p-2 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            title="Toggle theme"
-          >
-            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
+  onClick={toggleTheme}
+  className="p-2 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+  title="Toggle theme"
+>
+  {theme === 'dark' ? (
+    <Sun className="w-4 h-4" />
+  ) : (
+    <Moon className="w-4 h-4" />
+  )}
+</button>
 
           <Button
             variant="ghost"
