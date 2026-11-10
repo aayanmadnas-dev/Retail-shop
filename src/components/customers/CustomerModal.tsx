@@ -55,7 +55,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
 
     try {
       if (customer) {
-        // Edit customer
+        // Edit customer informamtion
         const { data, error: updateError } = await supabase
           .from('customers')
           .update({
