@@ -63,6 +63,47 @@ input, textarea, select {
   background: #94a3b8;
 }
 
+
+/* =========================================
+   RetailFlow - Smooth Theme Transitions
+========================================= */
+
+/* Theme-aware elements */
+#root [class*="bg-"],
+#root [class*="text-"],
+#root [class*="border-"],
+#root [class*="shadow-"] {
+  transition:
+    background-color 300ms ease,
+    color 300ms ease,
+    border-color 300ms ease,
+    box-shadow 300ms ease,
+    fill 300ms ease,
+    stroke 300ms ease,
+    transform 200ms ease,
+    opacity 200ms ease;
+}
+
+/* Main application background */
+html,
+body,
+#root {
+  transition:
+    background-color 300ms ease,
+    color 300ms ease;
+}
+
+/* Accessibility: respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  #root,
+  #root *,
+  html,
+  body {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
 /* Print Invoice Styles */
 @media print {
   body * {
