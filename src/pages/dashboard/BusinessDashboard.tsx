@@ -1,3 +1,4 @@
+import { useLanguage } from '../../context/LanguageContext';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
@@ -37,7 +38,8 @@ import {
 
 export const BusinessDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { business } = useAuth();
+ const { business } = useAuth();
+const { t, language } = useLanguage();
 
   const [sales, setSales] = useState<Sale[]>([]);
   const [saleItems, setSaleItems] = useState<SaleItem[]>([]);
@@ -214,10 +216,10 @@ const monthlyGrossProfit = useMemo(() => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            Welcome back, {business?.name || 'Retailer'}
+           {t('welcomeBack')}, {business?.name || 'Retailer'}
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Here is your live retail sales and inventory performance summary.
+            {t('dashboardSummary')}
           </p>
         </div>
 
@@ -230,7 +232,7 @@ const monthlyGrossProfit = useMemo(() => {
             className="gap-2 shadow-sm shadow-emerald-600/30"
           >
             <Receipt className="w-4 h-4" />
-            Create New Bill
+            {t('createNewBill')}
           </Button>
         </div>
       </div>
