@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { useLanguage } from '../../context/LanguageContext';
 import {
   LayoutDashboard,
   Receipt,
@@ -11,14 +12,16 @@ import {
 import { cn } from '../../lib/utils';
 
 export const BottomNav: React.FC = () => {
-  const navItems = [
-    { to: '/dashboard', label: 'Home', icon: LayoutDashboard },
-    { to: '/billing', label: 'Billing', icon: Receipt },
-    { to: '/inventory', label: 'Stock', icon: Package },
-    { to: '/customers', label: 'Customers', icon: Users },
-    { to: '/reports', label: 'Reports', icon: BarChart3 },
-    { to: '/business-profile', label: 'Profile', icon: Store },
-  ];
+  const { t } = useLanguage();
+
+const navItems = [
+  { to: '/dashboard', label: t('home'), icon: LayoutDashboard },
+  { to: '/billing', label: t('billing'), icon: Receipt },
+  { to: '/inventory', label: t('stock'), icon: Package },
+  { to: '/customers', label: t('customers'), icon: Users },
+  { to: '/reports', label: t('reports'), icon: BarChart3 },
+  { to: '/business-profile', label: t('profile'), icon: Store },
+];
 
   return (
     <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-2 py-1 shadow-lg">
