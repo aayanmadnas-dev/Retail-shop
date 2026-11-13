@@ -3,17 +3,19 @@ import { NavLink, Link } from 'react-router-dom';
 import { LayoutDashboard, Receipt, Package, Users, BarChart3, Store, ChevronRight } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const Sidebar: React.FC = () => {
   const { business } = useAuth();
+const { t, language } = useLanguage();
 
   const links = [
-    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/billing', label: 'Billing / POS', icon: Receipt, highlight: true },
-    { to: '/inventory', label: 'Inventory', icon: Package },
-    { to: '/customers', label: 'Customers', icon: Users },
-    { to: '/reports', label: 'Reports & Analytics', icon: BarChart3 },
-  ];
+  { to: '/dashboard', label: t('dashboard'), icon: LayoutDashboard },
+  { to: '/billing', label: t('billing'), icon: Receipt, highlight: true },
+  { to: '/inventory', label: t('inventory'), icon: Package },
+  { to: '/customers', label: t('customers'), icon: Users },
+  { to: '/reports', label: t('reports'), icon: BarChart3 },
+];
 
   return (
     <aside className="hidden sm:flex flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 p-4 shrink-0 h-[calc(100vh-61px)] sticky top-[61px]">
@@ -33,11 +35,11 @@ export const Sidebar: React.FC = () => {
     </p>
 
     <p className="text-[11px] text-slate-500 truncate">
-      {business?.phone || 'Retail Business'}
+      {business?.phone || (language === 'hi' ? 'रिटेल व्यवसाय' : 'Retail Business')}
     </p>
 
     <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 font-semibold">
-      Manage Business Profile
+      {t('manageProfile')}
     </p>
   </div>
 
@@ -75,7 +77,7 @@ export const Sidebar: React.FC = () => {
       {/* Footer support / info */}
       <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-400 flex flex-col gap-1">
         <p className="font-semibold text-slate-600 dark:text-slate-300">RetailFlow SaaS India</p>
-        <p>Mobile-first POS & Inventory</p>
+<p>{language === 'hi' ? 'मोबाइल बिलिंग और स्टॉक प्रबंधन' : 'Mobile-first POS & Inventory'}</p>
       </div>
     </aside>
   );
