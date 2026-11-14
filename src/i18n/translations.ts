@@ -60,6 +60,12 @@ export const translations = {
     walkIn: 'Walk-in',
     general: 'General',
 
+    // Inventory
+inventoryTitle: 'Inventory & Stock',
+inventoryDescription: 'Manage your products, prices and available stock.',
+exportCSV: 'Export CSV',
+importCSV: 'Import CSV',
+
     // General
     welcome: 'Welcome',
     loading: 'Loading...',
@@ -125,6 +131,12 @@ export const translations = {
     remaining: 'बाकी',
     walkIn: 'सीधे आए ग्राहक',
     general: 'सामान्य',
+
+    // Inventory
+inventoryTitle: 'सामान और स्टॉक',
+inventoryDescription: 'अपने सामान, कीमत और उपलब्ध स्टॉक का हिसाब रखें।',
+exportCSV: 'CSV डाउनलोड करें',
+importCSV: 'CSV अपलोड करें',
 
     // General
     welcome: 'स्वागत है',
