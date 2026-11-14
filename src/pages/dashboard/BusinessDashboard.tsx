@@ -236,47 +236,55 @@ const monthlyGrossProfit = useMemo(() => {
       </div>
 
       {/* Primary Metrics Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <StatCard
-         title={t('todaysSales')}
-          value={formatCurrency(todaySales)}
-          subtitle={t('salesRecordedToday')}
-          icon={<IndianRupee className="w-5 h-5" />}
-          iconBgColor="bg-emerald-50 dark:bg-emerald-950/40"
-          iconColor="text-emerald-600 dark:text-emerald-400"
-          onClick={() => navigate('/reports')}
-        />
+<div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+<StatCard
+          title="Today's Sales"
+        
+value={formatCurrency(todaySales)}
+          subtitle="Sales recorded today"
+          
+icon={<IndianRupee className="w-5 h-5" />}
+iconBgColor="bg-emerald-50 dark:bg-emerald-950/40"
+iconColor="text-emerald-600 dark:text-emerald-400"
+onClick={() => navigate('/reports')}
+/>
 
-       <StatCard
-        title={t('monthlyGrossProfit')}
-        value={formatCurrency(monthlyGrossProfit)}
-        subtitle={t('salesMinusCosts')}
-        icon={<TrendingUp className="w-5 h-5" />}
-        iconBgColor="bg-emerald-50 dark:bg-emerald-950/40"
-        iconColor="text-emerald-600 dark:text-emerald-400"
-        onClick={() => navigate('/reports')}
-      />
+<StatCard
+        title="Monthly Gross Profit"
+        
+value={formatCurrency(monthlyGrossProfit)}
+        subtitle="Sales minus product costs"
+        
+icon={<TrendingUp className="w-5 h-5" />}
+iconBgColor="bg-emerald-50 dark:bg-emerald-950/40"
+iconColor="text-emerald-600 dark:text-emerald-400"
+onClick={() => navigate('/reports')}
+/>
 
-        <StatCard
-          title={t('totalProducts')}
-          value={products.length}
-          subtitle={`${t('valuedAt')} ${formatCurrency(totalInventoryValuation)}`}
-          icon={<Package className="w-5 h-5" />}
-          iconBgColor="bg-purple-50 dark:bg-purple-950/40"
-          iconColor="text-purple-600 dark:text-purple-400"
-          onClick={() => navigate('/inventory')}
-        />
+<StatCard
+          title="Total Products"
+          
+value={products.length}
+          subtitle={`Valued at ${formatCurrency(totalInventoryValuation)}`}
+          
+icon={<Package className="w-5 h-5" />}
+iconBgColor="bg-purple-50 dark:bg-purple-950/40"
+iconColor="text-purple-600 dark:text-purple-400"
+onClick={() => navigate('/inventory')}
+/>
 
-        <StatCard
-          title={t('lowStockAlerts')}
-          value={lowStockProducts.length}
-          subtitle={
-            lowStockProducts.length > 0
-              ? t('itemsNeedingRestock')
-: t('allInventoryStocked')
-          }
-          icon={<AlertTriangle className="w-5 h-5" />}
-          iconBgColor={
+<StatCard
+          title="Low Stock Alerts"
+         
+value={lowStockProducts.length}
+subtitle={
+lowStockProducts.length > 0
+              ? 'Items needing restock'
+              : 'All inventory stocked'
+             
+}
+icon={<AlertTriangle className="w-5 h-5" />}
+iconBgColor={
             lowStockProducts.length > 0
               ? 'bg-rose-50 dark:bg-rose-950/40'
               : 'bg-slate-100 dark:bg-slate-800'
