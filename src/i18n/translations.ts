@@ -66,6 +66,16 @@ inventoryDescription: 'Manage your products, prices and available stock.',
 exportCSV: 'Export CSV',
 importCSV: 'Import CSV',
 
+    // Inventory summary and filters
+totalUnitsInStock: 'Total Units in Stock',
+costValuation: 'Stock Cost Value',
+retailPotential: 'Retail Value',
+searchInventory: 'Search product name, category, SKU or barcode...',
+scanBarcode: 'Scan Barcode',
+lowStock: 'Low Stock (≤ 5)',
+refreshProducts: 'Refresh product list',
+allCategories: 'All Categories',
+
     // General
     welcome: 'Welcome',
     loading: 'Loading...',
@@ -137,6 +147,16 @@ inventoryTitle: 'सामान और स्टॉक',
 inventoryDescription: 'अपने सामान, कीमत और उपलब्ध स्टॉक का हिसाब रखें।',
 exportCSV: 'CSV डाउनलोड करें',
 importCSV: 'CSV अपलोड करें',
+
+    // Inventory summary and filters
+totalUnitsInStock: 'स्टॉक में कुल सामान',
+costValuation: 'स्टॉक की खरीद कीमत',
+retailPotential: 'स्टॉक की बिक्री कीमत',
+searchInventory: 'सामान का नाम, कैटेगरी, SKU या बारकोड खोजें...',
+scanBarcode: 'बारकोड स्कैन करें',
+lowStock: 'कम स्टॉक (≤ 5)',
+refreshProducts: 'सामान की सूची अपडेट करें',
+allCategories: 'सभी कैटेगरी',
 
     // General
     welcome: 'स्वागत है',
