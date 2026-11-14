@@ -242,7 +242,7 @@ export const InventoryPage: React.FC = () => {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
           <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
-            Total Products
+            {t('totalProducts')}
           </span>
           <p className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-1">
             {products.length}
@@ -251,7 +251,7 @@ export const InventoryPage: React.FC = () => {
 
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
           <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
-            Total Units in Stock
+            {t('totalUnitsInStock')}
           </span>
           <p className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-1">
             {totalStockUnits}
@@ -260,7 +260,7 @@ export const InventoryPage: React.FC = () => {
 
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
           <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
-            Cost Valuation (Cost)
+           	{t('costValuation')}
           </span>
           <p className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-1">
             {formatCurrency(totalPurchaseValuation)}
@@ -269,7 +269,7 @@ export const InventoryPage: React.FC = () => {
 
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
           <span className="text-[11px] uppercase tracking-wider text-emerald-600 font-semibold">
-            Retail Potential (MRP)
+            {t('retailPotential')}
           </span>
           <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
             {formatCurrency(totalRetailValuation)}
@@ -285,7 +285,7 @@ export const InventoryPage: React.FC = () => {
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             <input
               type="text"
-              placeholder="Search product name, category, SKU, barcode..."
+             placeholder={t('searchInventory')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full h-10 pl-9 pr-3.5 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
@@ -299,7 +299,7 @@ export const InventoryPage: React.FC = () => {
             className="h-10 gap-1.5 w-full sm:w-auto"
           >
             <Barcode className="w-4 h-4 text-emerald-600" />
-            Scan Barcode
+            {t('scanBarcode')}
           </Button>
           </div>
 
@@ -312,7 +312,7 @@ export const InventoryPage: React.FC = () => {
                 }`}
             >
               <AlertTriangle className="w-3.5 h-3.5" />
-              Low Stock (&le; 5)
+             {t('lowStock')}
             </button>
 
             <Button
@@ -320,7 +320,7 @@ export const InventoryPage: React.FC = () => {
               size="sm"
               onClick={fetchProducts}
               className="p-2.5 h-10"
-              title="Refresh product list"
+              title={t('refreshProducts')}
             >
               <RotateCw className="w-4 h-4" />
             </Button>
@@ -337,7 +337,7 @@ export const InventoryPage: React.FC = () => {
                 : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
                 }`}
             >
-              All Categories
+              	{t('allCategories')}
             </button>
             {categories.map((c) => (
               <button
