@@ -421,9 +421,9 @@ const monthlyGrossProfit = useMemo(() => {
           <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
             <div>
               <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
-                Recent Transactions
+                	{t('recentTransactions')}
               </h3>
-              <p className="text-[11px] text-slate-400">Latest invoices generated</p>
+              <p className="text-[11px] text-slate-400">	{t('latestInvoices')}</p>
             </div>
             <Button
               variant="ghost"
@@ -431,7 +431,7 @@ const monthlyGrossProfit = useMemo(() => {
               onClick={() => navigate('/reports')}
               className="text-xs text-emerald-600 gap-1"
             >
-              View All <ChevronRight className="w-3.5 h-3.5" />
+             {t('viewAll')} <ChevronRight className="w-3.5 h-3.5" />
             </Button>
           </div>
 
@@ -439,7 +439,7 @@ const monthlyGrossProfit = useMemo(() => {
             <TableSkeleton rows={4} />
           ) : recentTransactions.length === 0 ? (
             <div className="py-8 text-center text-slate-400 text-xs">
-              No bills created yet today.
+              	{t('noBillsYet')}
             </div>
           ) : (
             <div className="space-y-2">
@@ -467,7 +467,7 @@ const monthlyGrossProfit = useMemo(() => {
                       </Badge>
                     </div>
                     <p className="text-[11px] text-slate-400">
-                      {s.customers?.name || 'Walk-in'} • {s.payment_method.toUpperCase()} •{' '}
+                      {s.customers?.name || t('walkIn')} • {s.payment_method.toUpperCase()} •{' '}
                       {formatDate(s.created_at, true)}
                     </p>
                   </div>
@@ -488,9 +488,9 @@ const monthlyGrossProfit = useMemo(() => {
           <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
             <div>
               <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
-                Low Stock Alert
+                	{t('lowStockAlert')}
               </h3>
-              <p className="text-[11px] text-slate-400">Products with &le; 5 units</p>
+              <p className="text-[11px] text-slate-400">	{t('productsWithLowStock')}</p>
             </div>
             <Button
               variant="ghost"
@@ -498,7 +498,7 @@ const monthlyGrossProfit = useMemo(() => {
               onClick={() => navigate('/inventory')}
               className="text-xs text-emerald-600 gap-1"
             >
-              Restock <ChevronRight className="w-3.5 h-3.5" />
+             {t('restock')} <ChevronRight className="w-3.5 h-3.5" />
             </Button>
           </div>
 
@@ -507,7 +507,7 @@ const monthlyGrossProfit = useMemo(() => {
           ) : lowStockProducts.length === 0 ? (
             <div className="py-8 text-center text-slate-400 text-xs">
               <CheckCircle2 className="w-6 h-6 mx-auto mb-1 text-emerald-500" />
-              Healthy inventory. No low-stock items.
+              	{t('healthyInventory')}
             </div>
           ) : (
             <div className="space-y-2">
@@ -521,7 +521,7 @@ const monthlyGrossProfit = useMemo(() => {
                       {p.name}
                     </h4>
                     <p className="text-[11px] text-slate-400">
-                      {p.category || 'General'} • MRP: {formatCurrency(p.selling_price)}
+                      {p.category || t('general')} • MRP: {formatCurrency(p.selling_price)}
                     </p>
                   </div>
 
@@ -529,7 +529,7 @@ const monthlyGrossProfit = useMemo(() => {
                     <span className="text-sm font-bold font-mono text-rose-600">
                       {p.stock_quantity} {p.unit}
                     </span>
-                    <span className="text-[10px] text-rose-500 block">Remaining</span>
+                    <span className="text-[10px] text-rose-500 block">	{t('remaining')}</span>
                   </div>
                 </div>
               ))}
