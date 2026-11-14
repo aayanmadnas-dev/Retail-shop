@@ -303,9 +303,9 @@ const monthlyGrossProfit = useMemo(() => {
           </div>
           <div>
             <span className="text-xs font-bold text-slate-900 dark:text-slate-100 block">
-              POS Billing
-            </span>
-            <span className="text-[11px] text-slate-400">Quick Invoice</span>
+  {t('posBilling')}
+</span>
+            <span className="text-[11px] text-slate-400">{t('quickInvoice')}</span>
           </div>
         </button>
 
@@ -318,9 +318,9 @@ const monthlyGrossProfit = useMemo(() => {
           </div>
           <div>
             <span className="text-xs font-bold text-slate-900 dark:text-slate-100 block">
-              Add Product
+              {t('addProduct')}
             </span>
-            <span className="text-[11px] text-slate-400">Manage Catalog</span>
+            <span className="text-[11px] text-slate-400">{t('manageCatalog')}</span>
           </div>
         </button>
 
@@ -333,9 +333,9 @@ const monthlyGrossProfit = useMemo(() => {
           </div>
           <div>
             <span className="text-xs font-bold text-slate-900 dark:text-slate-100 block">
-              Customers
+              	{t('customers')}
             </span>
-            <span className="text-[11px] text-slate-400">Credit Ledger</span>
+            <span className="text-[11px] text-slate-400">	{t('creditLedger')}</span>
           </div>
         </button>
 
@@ -348,9 +348,9 @@ const monthlyGrossProfit = useMemo(() => {
           </div>
           <div>
             <span className="text-xs font-bold text-slate-900 dark:text-slate-100 block">
-              Reports
+             	{t('reports')}
             </span>
-            <span className="text-[11px] text-slate-400">Sales Analytics</span>
+            <span className="text-[11px] text-slate-400">	{t('salesAnalytics')}</span>
           </div>
         </button>
       </div>
