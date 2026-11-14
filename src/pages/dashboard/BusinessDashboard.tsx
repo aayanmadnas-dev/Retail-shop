@@ -238,9 +238,9 @@ const monthlyGrossProfit = useMemo(() => {
       {/* Primary Metrics Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard
-          title="Today's Sales"
+         title={t('todaysSales')}
           value={formatCurrency(todaySales)}
-          subtitle="Sales recorded today"
+          subtitle={t('salesRecordedToday')}
           icon={<IndianRupee className="w-5 h-5" />}
           iconBgColor="bg-emerald-50 dark:bg-emerald-950/40"
           iconColor="text-emerald-600 dark:text-emerald-400"
@@ -248,9 +248,9 @@ const monthlyGrossProfit = useMemo(() => {
         />
 
        <StatCard
-        title="Monthly Gross Profit"
+        title={t('monthlyGrossProfit')}
         value={formatCurrency(monthlyGrossProfit)}
-        subtitle="Sales minus product costs"
+        subtitle={t('salesMinusCosts')}
         icon={<TrendingUp className="w-5 h-5" />}
         iconBgColor="bg-emerald-50 dark:bg-emerald-950/40"
         iconColor="text-emerald-600 dark:text-emerald-400"
@@ -258,9 +258,9 @@ const monthlyGrossProfit = useMemo(() => {
       />
 
         <StatCard
-          title="Total Products"
+          title={t('totalProducts')}
           value={products.length}
-          subtitle={`Valued at ${formatCurrency(totalInventoryValuation)}`}
+          subtitle={`${t('valuedAt')} ${formatCurrency(totalInventoryValuation)}`}
           icon={<Package className="w-5 h-5" />}
           iconBgColor="bg-purple-50 dark:bg-purple-950/40"
           iconColor="text-purple-600 dark:text-purple-400"
@@ -268,12 +268,12 @@ const monthlyGrossProfit = useMemo(() => {
         />
 
         <StatCard
-          title="Low Stock Alerts"
+          title={t('lowStockAlerts')}
           value={lowStockProducts.length}
           subtitle={
             lowStockProducts.length > 0
-              ? 'Items needing restock'
-              : 'All inventory stocked'
+              ? t('itemsNeedingRestock')
+: t('allInventoryStocked')
           }
           icon={<AlertTriangle className="w-5 h-5" />}
           iconBgColor={
