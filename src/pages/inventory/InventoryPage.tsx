@@ -6,6 +6,7 @@ import { ProductModal } from '../../components/inventory/ProductModal';
 import { StockAdjustModal } from '../../components/inventory/StockAdjustModal';
 import { StockMovementHistoryModal } from '../../components/inventory/StockMovementHistoryModal';
 import { BarcodeScannerModal } from '../../components/billing/BarcodeScannerModal';
+import { useLanguage } from '../../context/LanguageContext';
 import { CSVImportModal } from '../../components/inventory/CSVImportModal';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -33,6 +34,7 @@ import {
 
 export const InventoryPage: React.FC = () => {
   const { business } = useAuth();
+  const { t } = useLanguage();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -192,11 +194,11 @@ export const InventoryPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-            Inventory & Stock
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Manage your store catalog, retail pricing, barcode scanning, and stock levels.
-          </p>
+  {t('inventoryTitle')}
+</h1>
+<p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+  {t('inventoryDescription')}
+</p>
         </div>
 
        <div className="flex items-center gap-2">
@@ -208,7 +210,7 @@ export const InventoryPage: React.FC = () => {
     className="gap-2"
   >
     <Download className="w-4 h-4" />
-    <span className="hidden sm:inline">Export CSV</span>
+    <span className="hidden sm:inline">{t('exportCSV')}</span>
   </Button>
 
   <Button
@@ -218,7 +220,7 @@ export const InventoryPage: React.FC = () => {
     className="gap-2"
   >
     <Upload className="w-4 h-4" />
-    <span>Import CSV</span>
+    <span>	{t('importCSV')}</span>
   </Button>
 
   <Button
@@ -231,7 +233,7 @@ export const InventoryPage: React.FC = () => {
     className="gap-2"
   >
     <Plus className="w-4 h-4" />
-    Add Product
+    {t('addProduct')}
   </Button>
 </div>
       </div>
