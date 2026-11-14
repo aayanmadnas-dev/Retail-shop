@@ -405,17 +405,17 @@ export const InventoryPage: React.FC = () => {
                     </h3>
                     {isService ? (
                       <Badge variant="blue" size="sm">
-                        SERVICE
+                      {t('service')}
                       </Badge>
                     ) : (
                       <Badge variant="slate" size="sm">
-                        {p.category || 'Product'}
+                        {p.category || t('product')}
                       </Badge>
                     )}
                     {isLowStock && (
                       <Badge variant="rose" size="sm">
                         <AlertTriangle className="w-3 h-3 mr-0.5" />
-                        Low Stock
+                        {t('lowStockLabel')}
                       </Badge>
                     )}
                   </div>
@@ -423,7 +423,7 @@ export const InventoryPage: React.FC = () => {
                   {/* Pricing and identifiers */}
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
                     <div>
-                      Rate / Price:{' '}
+                      	{t('ratePrice')}:{' '}
                       <span className="font-bold text-slate-900 dark:text-slate-100 text-sm">
                         {formatCurrency(p.selling_price)}
                       </span>
@@ -432,15 +432,15 @@ export const InventoryPage: React.FC = () => {
 
                     {!isService && Number(p.purchase_price) > 0 && (
                       <div>
-                        Cost:{' '}
+                       {t('costPrice')}:{' '}
                         <span className="font-medium text-slate-600 dark:text-slate-300">
                           {formatCurrency(p.purchase_price)}
                         </span>
                       </div>
                     )}
 
-                    {!isService && p.sku && <div>SKU: <span className="font-mono">{p.sku}</span></div>}
-                    {!isService && p.barcode && <div>Barcode: <span className="font-mono">{p.barcode}</span></div>}
+                    {!isService && p.sku && <div>	{t('skuLabel')}:<span className="font-mono">{p.sku}</span></div>}
+                    {!isService && p.barcode && <div>{t('barcodeLabel')}: <span className="font-mono">{p.barcode}</span></div>}
                   </div>
                 </div>
 
@@ -450,16 +450,16 @@ export const InventoryPage: React.FC = () => {
                     {isService ? (
                       <div>
                         <span className="text-[10px] text-blue-600 dark:text-blue-400 uppercase font-semibold block">
-                          Non-Inventory
+                          	{t('nonInventory')}
                         </span>
                         <span className="text-xs font-medium text-slate-500">
-                          No stock tracking
+                        {t('noStockTracking')}
                         </span>
                       </div>
                     ) : (
                       <div>
                         <span className="text-[11px] text-slate-400 uppercase font-semibold block">
-                          In Stock
+                          {t('inStock')}
                         </span>
                         <span
                           className={`text-lg font-bold font-mono ${
@@ -485,7 +485,7 @@ export const InventoryPage: React.FC = () => {
                         title="Adjust or restock quantity"
                       >
                         <ArrowUpDown className="w-3.5 h-3.5" />
-                        Adjust Stock
+                        {t('adjustStock')}
                       </Button>
 
                       <Button
@@ -493,7 +493,7 @@ export const InventoryPage: React.FC = () => {
                         size="sm"
                         onClick={() => setHistoryProduct(p)}
                         className="p-2 text-slate-500 hover:text-slate-700"
-                        title="Audit trail of stock movements"
+                       title={t('stockHistory')}
                       >
                         <History className="w-4 h-4" />
                       </Button>
@@ -508,7 +508,7 @@ export const InventoryPage: React.FC = () => {
                       setIsProductModalOpen(true);
                     }}
                     className="p-2 text-slate-500 hover:text-slate-700"
-                    title="Edit item"
+                    title={t('editItem')}
                   >
                     <Edit2 className="w-4 h-4" />
                   </Button>
@@ -521,7 +521,7 @@ export const InventoryPage: React.FC = () => {
                       setDeletingProduct(p);
                     }}
                     className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40"
-                    title="Remove product"
+                    title={t('removeProduct')}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
