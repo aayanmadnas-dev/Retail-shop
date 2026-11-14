@@ -360,12 +360,12 @@ const monthlyGrossProfit = useMemo(() => {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-              7-Day Sales Overview
+              {t('salesOverview')}
             </h3>
-            <p className="text-xs text-slate-500">Daily retail revenue trajectory</p>
+            <p className="text-xs text-slate-500">	{t('dailyRevenue')}</p>
           </div>
           <span className="text-xs font-mono font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg">
-            Last 7 Days
+            {t('last7Days')}
           </span>
         </div>
 
@@ -392,7 +392,7 @@ const monthlyGrossProfit = useMemo(() => {
                 tickFormatter={(val) => `₹${val}`}
               />
               <Tooltip
-                formatter={(value: any) => [`₹${value}`, 'Revenue']}
+  formatter={(value: any) => [`₹${value}`, t('revenue')]}
                 contentStyle={{
                   backgroundColor: '#0f172a',
                   borderRadius: '0.75rem',
