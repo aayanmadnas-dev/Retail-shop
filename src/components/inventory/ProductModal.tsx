@@ -4,6 +4,7 @@ import { Modal } from '../ui/Modal';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { supabase } from '../../lib/supabase';
+import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import type { Product, ItemType } from '../../types/database';
 import { AlertCircle, Barcode, Tag, Package, Wrench, Layers, Camera } from 'lucide-react';
@@ -25,6 +26,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   product,
 }) => {
   const { business } = useAuth();
+  const { t } = useLanguage();
 
   const [itemType, setItemType] = useState<ItemType>('inventory');
   const [name, setName] = useState('');
@@ -88,7 +90,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           if (cancelled) return;
 
           setBarcode(decodedText);
-          setCameraStatus('Barcode captured successfully!');
+          setCameraStatus(t('barcodeCaptured'));
           setIsCameraOpen(false);
         },
         () => {
@@ -104,7 +106,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 
       if (!cancelled) {
         setCameraStatus(
-          'Camera unavailable. Please allow camera permission or enter the barcode manually.'
+          t('cameraUnavailable')
         );
       }
     }
@@ -150,12 +152,12 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!business?.id) {
-      setError('Business context missing. Please re-login.');
+      setError(	t('businessContextMissing'));
       return;
     }
 
     if (!name.trim()) {
-      setError('Item / Product name is required.');
+      setError(t('itemProductNameRequired'));
       return;
     }
 
@@ -164,7 +166,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
     const qty = itemType === 'service' ? 0 : parseFloat(stockQuantity) || 0;
 
     if (sPrice < 0 || pPrice < 0) {
-      setError('Prices cannot be negative numbers.');
+      setError(	t('pricesCannotBeNegative'));
       return;
     }
 
@@ -250,14 +252,14 @@ export const ProductModal: React.FC<ProductModalProps> = ({
     err.code === '23505' &&
     err.message?.includes('products_business_id_barcode_active_key')
   ) {
-    setError('This barcode is already assigned to another active product in your business.');
+    setError(t('barcodeAlreadyAssigned'));
   } else if (
     err.code === '23505' &&
     err.message?.includes('products_business_id_sku_key')
   ) {
-    setError('This SKU is already assigned to another product in your business.');
+    setError(t('skuAlreadyAssigned'));
   } else {
-    setError(err.message || 'Failed to save item.');
+    setError(err.message || 	t('failedToSaveItem'));
   }
 } finally {
   setIsLoading(false);
@@ -268,12 +270,12 @@ export const ProductModal: React.FC<ProductModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={product ? 'Edit Item / Service' : 'Add Item / Service'}
+     title={product ? t('editItemService') : t('addItemService')}
       description={
-        product
-          ? 'Update pricing, classification, and billing details'
-          : 'Create physical inventory items or non-inventory service charges'
-      }
+  product
+    ? t('updateProductDetails')
+    : t('createProductDetails')
+}
       maxWidth="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -287,7 +289,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         {/* Item Classification Selector */}
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
-            Item Classification <span className="text-rose-500">*</span>
+            {t('itemClassification')} <span className="text-rose-500">*</span>
           </label>
           <div className="grid grid-cols-2 gap-2">
             <button
@@ -303,8 +305,8 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                 <Package className="w-4 h-4" />
               </div>
               <div>
-                <p className="text-xs font-bold leading-tight">Inventory Product</p>
-                <p className="text-[10px] text-slate-500 mt-0.5">Physical goods with stock deduction</p>
+                <p className="text-xs font-bold leading-tight">{t('inventoryProduct')}</p>
+                <p className="text-[10px] text-slate-500 mt-0.5">{t('physicalGoodsDescription')}</p>
               </div>
             </button>
 
@@ -321,8 +323,8 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                 <Wrench className="w-4 h-4" />
               </div>
               <div>
-                <p className="text-xs font-bold leading-tight">Service / Non-Inventory</p>
-                <p className="text-[10px] text-slate-500 mt-0.5">Labor, delivery, repair (no stock impact)</p>
+                <p className="text-xs font-bold leading-tight">{t('serviceNonInventory')}</p>
+                <p className="text-[10px] text-slate-500 mt-0.5">{t('serviceDescription')}</p>
               </div>
             </button>
           </div>
@@ -330,12 +332,12 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Input
-            label={itemType === 'service' ? 'Service / Charge Name' : 'Product Name'}
-            placeholder={
-              itemType === 'service'
-                ? 'e.g. Delivery Charge, Labour Charge, Repair Service'
-                : 'e.g. Basmati Rice 1kg or Parle-G Biscuit'
-            }
+           label={itemType === 'service' ? t('serviceChargeName') : t('productName')}
+placeholder={
+  itemType === 'service'
+    ? t('serviceNamePlaceholder')
+    : t('productNamePlaceholder')
+}
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -343,15 +345,17 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           />
 
           <Input
-            label="Category"
-            placeholder={itemType === 'service' ? 'Service, Charges, Repair, Delivery' : 'e.g. Grocery, Snacks, Dairy'}
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
+           label={t('category')}
+placeholder={
+  itemType === 'service'
+    ? t('serviceCategoryPlaceholder')
+    : t('productCategoryPlaceholder')
+}
           />
 
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
-              Unit of Measure <span className="text-rose-500">*</span>
+              t('unitOfMeasure') <span className="text-rose-500">*</span>
             </label>
             <select
               value={unit}
@@ -372,7 +376,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
             type="number"
             step="0.01"
             min="0"
-            label="Billing Price / Rate (₹)"
+            label=t('billingPriceRate'))
             placeholder="0.00"
             value={sellingPrice}
             onChange={(e) => setSellingPrice(e.target.value)}
@@ -383,7 +387,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
             type="number"
             step="0.01"
             min="0"
-            label={itemType === 'service' ? 'Internal Cost / Expense (₹) (Optional)' : 'Purchase / Cost (₹)'}
+            label={itemType === 'service' ? t('internalCostExpense') : t('purchaseCost')}
             placeholder="0.00"
             value={purchasePrice}
             onChange={(e) => setPurchasePrice(e.target.value)}
@@ -394,7 +398,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
               type="number"
               step="any"
               min="0"
-              label="Current Stock"
+              label=t('currentStock')
               placeholder="0"
               value={stockQuantity}
               onChange={(e) => setStockQuantity(e.target.value)}
@@ -407,11 +411,11 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         {itemType === 'inventory' && (
           <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-3">
             <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-              Optional Codes (Leave blank if not used):
+              t('optionalCodes')
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Input
-                label="SKU Code (Optional)"
+                label=t('skuCodeOptional')
                 placeholder="e.g. BR-1001"
                 value={sku}
                 onChange={(e) => setSku(e.target.value)}
@@ -419,7 +423,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
               />
               <div className="space-y-2">
   <Input
-    label="Barcode / EAN (Optional)"
+    label=t('barcodeEANOptional')
     placeholder="e.g. 8901234567890"
     value={barcode}
     onChange={(e) => setBarcode(e.target.value)}
@@ -436,7 +440,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
     }}
   >
     <Camera className="w-4 h-4" />
-    Scan Using Camera
+    t('scanUsingCamera')
   </Button>
 
   {isCameraOpen && (
@@ -452,7 +456,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         className="w-full"
         onClick={() => setIsCameraOpen(false)}
       >
-        Close Camera
+        t('closeCamera')
       </Button>
     </div>
   )}
@@ -469,10 +473,14 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 
         <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
           <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
-            Cancel
+            t('cancel')
           </Button>
           <Button type="submit" variant="primary" isLoading={isLoading}>
-            {product ? 'Save Changes' : itemType === 'service' ? 'Add Service Item' : 'Add Product'}
+            {product
+  ? t('saveChanges')
+  : itemType === 'service'
+    ? t('addServiceItem')
+    : t('addProduct')}
           </Button>
         </div>
       </form>
