@@ -131,6 +131,24 @@ removeProduct: 'Remove product',
     barcodeCaptured: 'Barcode captured successfully!',
     cameraUnavailable: 'Camera unavailable. Please allow camera permission or enter the barcode manually.',
 
+    // Stock adjustment
+adjustInventoryStock: 'Adjust Inventory Stock',
+updatePhysicalStock: 'Update physical stock quantity',
+currentStock: 'Current Stock',
+projectedStock: 'Projected Stock',
+adjustmentReason: 'Adjustment Reason',
+addStock: 'Add Stock',
+damageLost: 'Damage / Lost',
+setExact: 'Set Exact',
+quantityToAdd: 'Quantity to Add',
+quantityDamaged: 'Quantity Damaged / Deducted',
+exactStockCount: 'Exact Stock Count',
+saveAdjustment: 'Save Adjustment',
+quantityGreaterThanZero: 'Please enter a quantity greater than zero.',
+cannotDeductMore: 'Cannot deduct more than current stock.',
+failedToAdjustStock: 'Failed to adjust stock.',
+cancel: 'Cancel',
+
 
     // General
     welcome: 'Welcome',
@@ -268,6 +286,24 @@ removeProduct: 'सामान हटाएं',
     failedToSaveItem: 'सामान सेव नहीं हो पाया।',
     barcodeCaptured: 'बारकोड सफलतापूर्वक स्कैन हो गया!',
     cameraUnavailable: 'कैमरा उपलब्ध नहीं है। कैमरे की अनुमति दें या बारकोड खुद दर्ज करें।',
+
+    // Stock adjustment
+adjustInventoryStock: 'स्टॉक में बदलाव करें',
+updatePhysicalStock: 'दुकान में मौजूद सामान की मात्रा बदलें',
+currentStock: 'मौजूदा स्टॉक',
+projectedStock: 'बदलाव के बाद स्टॉक',
+adjustmentReason: 'बदलाव का कारण',
+addStock: 'स्टॉक बढ़ाएँ',
+damageLost: 'खराब / गुम',
+setExact: 'सही मात्रा दर्ज करें',
+quantityToAdd: 'कितनी मात्रा जोड़नी है',
+quantityDamaged: 'खराब / कम हुई मात्रा',
+exactStockCount: 'सामान की सही मात्रा',
+saveAdjustment: 'बदलाव सेव करें',
+quantityGreaterThanZero: 'कृपया शून्य से अधिक मात्रा दर्ज करें।',
+cannotDeductMore: 'मौजूदा स्टॉक से ज्यादा मात्रा कम नहीं कर सकते।',
+failedToAdjustStock: 'स्टॉक में बदलाव नहीं हो पाया।',
+cancel: 'रद्द करें',
 
 
     // General
