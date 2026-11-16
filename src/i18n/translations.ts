@@ -134,7 +134,6 @@ removeProduct: 'Remove product',
     // Stock adjustment
 adjustInventoryStock: 'Adjust Inventory Stock',
 updatePhysicalStock: 'Update physical stock quantity',
-currentStock: 'Current Stock',
 projectedStock: 'Projected Stock',
 adjustmentReason: 'Adjustment Reason',
 addStock: 'Add Stock',
@@ -147,7 +146,6 @@ saveAdjustment: 'Save Adjustment',
 quantityGreaterThanZero: 'Please enter a quantity greater than zero.',
 cannotDeductMore: 'Cannot deduct more than current stock.',
 failedToAdjustStock: 'Failed to adjust stock.',
-cancel: 'Cancel',
 
 
     // General
@@ -290,7 +288,6 @@ removeProduct: 'सामान हटाएं',
     // Stock adjustment
 adjustInventoryStock: 'स्टॉक में बदलाव करें',
 updatePhysicalStock: 'दुकान में मौजूद सामान की मात्रा बदलें',
-currentStock: 'मौजूदा स्टॉक',
 projectedStock: 'बदलाव के बाद स्टॉक',
 adjustmentReason: 'बदलाव का कारण',
 addStock: 'स्टॉक बढ़ाएँ',
@@ -303,7 +300,6 @@ saveAdjustment: 'बदलाव सेव करें',
 quantityGreaterThanZero: 'कृपया शून्य से अधिक मात्रा दर्ज करें।',
 cannotDeductMore: 'मौजूदा स्टॉक से ज्यादा मात्रा कम नहीं कर सकते।',
 failedToAdjustStock: 'स्टॉक में बदलाव नहीं हो पाया।',
-cancel: 'रद्द करें',
 
 
     // General
