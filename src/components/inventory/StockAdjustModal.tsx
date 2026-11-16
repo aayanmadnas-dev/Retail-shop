@@ -4,6 +4,7 @@ import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import type { Product } from '../../types/database';
 import { AlertCircle, PlusCircle, MinusCircle, RefreshCw } from 'lucide-react';
 
@@ -21,6 +22,7 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
   onSuccess,
 }) => {
   const { business } = useAuth();
+  const { t } = useLanguage();
   const [adjustmentType, setAdjustmentType] = useState<'restock' | 'damage' | 'set'>('restock');
   const [amount, setAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -45,12 +47,12 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
     if (!business?.id) return;
 
     if (numAmount <= 0 && adjustmentType !== 'set') {
-      setError('Please enter a quantity greater than zero.');
+      setError(t('quantityGreaterThanZero'));
       return;
     }
 
     if (adjustmentType === 'damage' && numAmount > currentStock) {
-      setError(`Cannot deduct more than current stock (${currentStock} ${product.unit}).`);
+      setError(`Cannot deduct more than current stock (${currentStock} ${product.unit}).`)`${t('cannotDeductMore')} (${currentStock} ${product.unit}).`;
       return;
     }
 
@@ -95,7 +97,7 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
       onSuccess();
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Failed to adjust stock.');
+      setError(err.message || t('failedToAdjustStock'));
     } finally {
       setIsLoading(false);
     }
@@ -105,8 +107,8 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Adjust Inventory Stock"
-      description={`Update physical stock quantity for ${product.name}`}
+      title={t('adjustInventoryStock')}
+description={`${t('updatePhysicalStock')} for ${product.name}`}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
@@ -120,7 +122,7 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
         <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div>
             <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
-              Current Stock
+              {t('currentStock')}
             </span>
             <p className="text-lg font-bold text-slate-900 dark:text-slate-100">
               {currentStock} <span className="text-xs font-normal text-slate-500">{product.unit}</span>
@@ -128,7 +130,7 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
           </div>
           <div className="text-right">
             <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
-              Projected Stock
+              	{t('projectedStock')}
             </span>
             <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
               {calculatedNewStock}{' '}
@@ -140,7 +142,7 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
         {/* Adjustment type selection */}
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
-            Adjustment Reason
+            	{t('adjustmentReason')}
           </label>
           <div className="grid grid-cols-3 gap-2">
             <button
@@ -153,7 +155,7 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
               }`}
             >
               <PlusCircle className="w-4 h-4" />
-              <span>Add Stock</span>
+              <span>	{t('addStock')}</span>
             </button>
             <button
               type="button"
@@ -165,7 +167,7 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
               }`}
             >
               <MinusCircle className="w-4 h-4" />
-              <span>Damage / Lost</span>
+              <span>{t('damageLost')}</span>
             </button>
             <button
               type="button"
@@ -177,7 +179,7 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
               }`}
             >
               <RefreshCw className="w-4 h-4" />
-              <span>Set Exact</span>
+              <span>{t('setExact')}</span>
             </button>
           </div>
         </div>
@@ -186,13 +188,13 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
           type="number"
           step="any"
           min="0"
-          label={
-            adjustmentType === 'restock'
-              ? `Quantity to Add (${product.unit})`
-              : adjustmentType === 'damage'
-              ? `Quantity Damaged/Deducted (${product.unit})`
-              : `Exact Stock Count (${product.unit})`
-          }
+        label={
+  adjustmentType === 'restock'
+    ? `${t('quantityToAdd')} (${product.unit})`
+    : adjustmentType === 'damage'
+    ? `${t('quantityDamaged')} (${product.unit})`
+    : `${t('exactStockCount')} (${product.unit})`
+}
           placeholder="0"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
@@ -201,10 +203,10 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
 
         <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
           <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
-            Cancel
+            	{t('cancel')}
           </Button>
           <Button type="submit" variant="primary" isLoading={isLoading}>
-            Save Adjustment
+            {t('saveAdjustment')}
           </Button>
         </div>
       </form>
