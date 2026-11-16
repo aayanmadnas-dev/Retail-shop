@@ -355,7 +355,7 @@ placeholder={
 
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
-              t('unitOfMeasure') <span className="text-rose-500">*</span>
+              {t('unitOfMeasure')} <span className="text-rose-500">*</span>
             </label>
             <select
               value={unit}
@@ -376,7 +376,7 @@ placeholder={
             type="number"
             step="0.01"
             min="0"
-            label=t('billingPriceRate'))
+            label={t('billingPriceRate'))}
             placeholder="0.00"
             value={sellingPrice}
             onChange={(e) => setSellingPrice(e.target.value)}
@@ -398,7 +398,7 @@ placeholder={
               type="number"
               step="any"
               min="0"
-              label=t('currentStock')
+              label={t('currentStock')}
               placeholder="0"
               value={stockQuantity}
               onChange={(e) => setStockQuantity(e.target.value)}
@@ -411,11 +411,11 @@ placeholder={
         {itemType === 'inventory' && (
           <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-3">
             <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-              t('optionalCodes')
+              {t('optionalCodes')}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Input
-                label=t('skuCodeOptional')
+                label={t('skuCodeOptional')}
                 placeholder="e.g. BR-1001"
                 value={sku}
                 onChange={(e) => setSku(e.target.value)}
@@ -423,7 +423,7 @@ placeholder={
               />
               <div className="space-y-2">
   <Input
-    label=t('barcodeEANOptional')
+    label={t('barcodeEANOptional')}
     placeholder="e.g. 8901234567890"
     value={barcode}
     onChange={(e) => setBarcode(e.target.value)}
@@ -440,7 +440,7 @@ placeholder={
     }}
   >
     <Camera className="w-4 h-4" />
-    t('scanUsingCamera')
+    {t('scanUsingCamera')}
   </Button>
 
   {isCameraOpen && (
@@ -456,7 +456,7 @@ placeholder={
         className="w-full"
         onClick={() => setIsCameraOpen(false)}
       >
-        t('closeCamera')
+      {t('closeCamera')}
       </Button>
     </div>
   )}
@@ -473,7 +473,7 @@ placeholder={
 
         <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
           <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
-            t('cancel')
+            {t('cancel')}
           </Button>
           <Button type="submit" variant="primary" isLoading={isLoading}>
             {product
