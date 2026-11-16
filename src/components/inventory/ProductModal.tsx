@@ -376,7 +376,7 @@ placeholder={
             type="number"
             step="0.01"
             min="0"
-            label={t('billingPriceRate'))}
+            label={t('billingPriceRate')}
             placeholder="0.00"
             value={sellingPrice}
             onChange={(e) => setSellingPrice(e.target.value)}
