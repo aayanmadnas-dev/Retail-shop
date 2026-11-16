@@ -52,7 +52,7 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
     }
 
     if (adjustmentType === 'damage' && numAmount > currentStock) {
-      setError(`Cannot deduct more than current stock (${currentStock} ${product.unit}).`)`${t('cannotDeductMore')} (${currentStock} ${product.unit}).`;
+      setError(`${t('cannotDeductMore')} (${currentStock} ${product.unit}).`);
       return;
     }
 
